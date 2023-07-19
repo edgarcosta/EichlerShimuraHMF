@@ -1,3 +1,6 @@
 {
-  ArtinSymbols.m
+  Eigenvalues.m
+  HeckeCharacters.m
+  main.m
+  TwistedLfunction.m
 }
