@@ -1,6 +1,9 @@
 {
+  CremonaTrick.m
   Eigenvalues.m
   HeckeCharacters.m
-  main.m
+  Lvalues.m
+  PeriodMatrices.m
   TwistedLfunction.m
+  Wrapper.m
 }

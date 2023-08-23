@@ -18,7 +18,6 @@ intrinsic LoadEigenvalues(~f, filename : hasheader:=true)
 { Load the eigenvalues from a file. }
 	F<w> := BaseRing(Parent(f));
 	OF := Integers(F);
-	NN := ideal<OF | [61, 61, 3*w - 10]>;
 	K := HeckeEigenvalueField(Parent(f));
 	coeffs := getrecs(filename);
     if hasheader then
@@ -30,8 +29,14 @@ intrinsic LoadEigenvalues(~f, filename : hasheader:=true)
     end if;
 	for i in range do
 		rec := coeffs[i];
+        if "." in rec[1] then
+            ideal := LMFDBIdeal(OF, rec[1]);
+        else
+            ideal := ideal<OF | [OF!g : g in eval rec[1]]>;
+        end if;
+        if IsZero(ideal) then continue; end if;
         try
-		    f`hecke_eigenvalues[LMFDBIdeal(OF, rec[1])] := K!eval rec[2];
+		    f`hecke_eigenvalues[ideal] := K!eval rec[2];
         catch e
             print "Could not process", rec;
         end try;
@@ -52,21 +57,31 @@ intrinsic make_eigenform(label) -> ModFrmHilElt
         <578, ["c", "d"]>,
         <722, ["i", "j", "l", "k"]>,
         <1587, ["i", "j", "k", "l", "m", "n"]>] | elt[1] eq norm][1];
+		dim := 4;
     elif d eq 8 then
         F<w> := NumberField(x^2 -2);
         OF := Integers(F);
         NN := [elt : elt in [(51)*OF, (37*w)*OF] | Norm(elt) eq norm][1];
         labels := [elt[2] : elt in [<2601, ["j", "k"]>, <2738, ["f", "e"]>] | elt[1] eq norm][1];
+		dim := 4;
     elif d eq 24 then
         F<w> := NumberField(x^2 -6);
         OF := Integers(F);
         NN := (-11*w)*OF;
         labels := ["j", "i","l", "k"];
+		dim := 4;
+    elif d eq 5 then
+        assert label eq "2.2.5.1-61.2-a";
+        F<w> := NumberField(x^2 - x - 1);
+        OF := Integers(F);
+        NN := [elt : elt in [(-3*w-7)*OF] | Norm(elt) eq norm][1];
+        labels := ["a"];
+		dim := 2;
     end if;
     M := NewformDecomposition(NewSubspace(HilbertCuspForms(F, NN)));
-    possible := [* Eigenform(elt) : elt in M | Dimension(elt) eq 4 *];
+    possible := [* Eigenform(elt) : elt in M | Dimension(elt) eq dim *];
     assert #possible eq #labels;
-    return [* Eigenform(elt) : elt in M | Dimension(elt) eq 4 *][Index(labels, endlabel)];
+    return [* Eigenform(elt) : elt in M | Dimension(elt) eq dim *][Index(labels, endlabel)];
 end intrinsic;
 
 procedure compute_eigenvalues(label, start, congclass, congmod, bound : known:={})
