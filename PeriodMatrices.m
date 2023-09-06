@@ -1,13 +1,10 @@
 // Given a totally real field F of degree g and a g-tuple of points in the upper half-plane, return the corresponding big period matrix
-intrinsic ModuliToBigPeriodMatrix(F, points : fix_signs := false) -> AlgMatElt
+intrinsic ModuliToBigPeriodMatrix(F, points) -> AlgMatElt
 { Given a list of taus and a totally real field, compute a big period matrix. }
     prec := Min([Precision(Parent(elt)) : elt in points]);
     CC := ComplexFieldExtra(prec);
     // should they be purely imaginary?
     //assert &and[Abs(Re(p)) lt CC`epscomp : p in points];
-    if fix_signs then
-        points := [ Im(p) lt 0 select 1/p else p : p in points]; // is this allowed?
-    end if;
     OF := Integers(F);
     g := Degree(F);
     betas := [[CC | Evaluate(OF.i, pl : Precision := prec+10) : pl in InfinitePlaces(F)] : i in [1..g]];
@@ -18,9 +15,9 @@ intrinsic ModuliToBigPeriodMatrix(F, points : fix_signs := false) -> AlgMatElt
 end intrinsic;
 
 // Given a totally real field F and a g-tuple of points in the upper half-plane, return the corresponding small period matrix
-intrinsic ModuliToSmallPeriodMatrix(F, points : fix_signs := false) -> AlgMatElt
+intrinsic ModuliToSmallPeriodMatrix(F, points) -> AlgMatElt
 { Given a list of taus and a totally real field, compute a small period matrix. }
-    return SmallPeriodMatrix(ModuliToBigPeriodMatrix(F, points : fix_signs := fix_signs));
+    return SmallPeriodMatrix(ModuliToBigPeriodMatrix(F, points));
 end intrinsic;
 
 // Given a totally real field F of degree g and a g-tuple of points in the upper half-plane, return the corresponding big period matrix
@@ -30,9 +27,6 @@ intrinsic ModuliToBigPeriodMatrixNoam(F, points : fix_signs := false) -> AlgMatE
     CC := ComplexFieldExtra(prec);
     // should they be purely imaginary?
     //assert &and[Abs(Re(p)) lt CC`epscomp : p in points];
-    if fix_signs then
-        points := [ Im(p) lt 0 select 1/p else p : p in points]; // is this allowed?
-    end if;
     OF := Integers(F);
     g := Degree(F);
     betas := [[CC | Evaluate(OF.i, pl : Precision := prec+10) : pl in InfinitePlaces(F)] : i in [1..g]];

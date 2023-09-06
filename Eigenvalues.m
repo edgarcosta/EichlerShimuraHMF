@@ -71,17 +71,19 @@ intrinsic make_eigenform(label) -> ModFrmHilElt
         labels := ["j", "i","l", "k"];
 		dim := 4;
     elif d eq 5 then
-        assert label eq "2.2.5.1-61.2-a";
+        assert label in ["2.2.5.1-61.2-a", "2.2.5.1-500.1-a", "2.2.5.1-500.1-b"];
         F<w> := NumberField(x^2 - x - 1);
         OF := Integers(F);
-        NN := [elt : elt in [(-3*w-7)*OF] | Norm(elt) eq norm][1];
-        labels := ["a"];
+        NN := [elt : elt in [(-3*w-7)*OF, (-20*w+10)*OF] | Norm(elt) eq norm ][1];
+        labels := [elt[2] : elt in [
+        <61, ["a"]>,
+        <500, ["a", "b"]>] | elt[1] eq norm][1];
 		dim := 2;
     end if;
     M := NewformDecomposition(NewSubspace(HilbertCuspForms(F, NN)));
     possible := [* Eigenform(elt) : elt in M | Dimension(elt) eq dim *];
     assert #possible eq #labels;
-    return [* Eigenform(elt) : elt in M | Dimension(elt) eq dim *][Index(labels, endlabel)];
+    return possible[Index(labels, endlabel)];
 end intrinsic;
 
 procedure compute_eigenvalues(label, start, congclass, congmod, bound : known:={})

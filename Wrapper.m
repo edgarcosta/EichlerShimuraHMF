@@ -48,6 +48,20 @@ function TausGuess(res_Cremona, dim, pnum, pden)
 	return taus;
 end function;
 
+function FixTaus(F, taus)
+	U, phi := UnitGroup(F);
+	G := [g : g in Generators(U)];
+	taus_signs := [Sign(Imaginary(tau)) : tau in taus];
+	for c in CartesianPower({0,1}, #Generators(U)) do
+		u := F!&*[phi(g)^c[i] : i->g in G];
+		u_signs := [-Sign(Real(Evaluate(u, rho))) : rho in InfinitePlaces(F)];
+		if taus_signs eq u_signs then
+			return [taus[i]*Evaluate(u, rho) : i->rho in InfinitePlaces(F)];
+		end if;
+	end for;
+	assert(false);
+end function;
+
 intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->.
 { Compute the period matrix à l'Oda }
 	// Find the L values
@@ -77,6 +91,7 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	
 	// Find the taus and period matrices
 	possible_taus := [TausGuess(res_Cremona, dim, pnum, pden) : pnum in cnum, pden in cden];
-	PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in possible_taus];
-	return PeriodMatrices;
+	fixed_taus := [[ FixTaus(F, tau) : tau in taus] : taus in possible_taus];
+	PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in fixed_taus];
+	return PeriodMatrices, <cnum, cden>;
 end intrinsic;
