@@ -1,3 +1,6 @@
+AttachSpec("spec");
+AttachSpec("../CHIMP/CHIMP.spec");
+
 procedure compute_eigenvalues(label, start, congclass, congmod, bound : known:={})
     f := 1;
     F := 1;
@@ -44,8 +47,9 @@ if assigned bound then
 else
     bound := 10^6;
 end if;
+
 b, F := OpenTest(label cat ".txt", "r");
-if b then
+if b and assigned F then
     known := {<StringToInteger(x) : x in Split(Split(elt, ":")[1], ".")> : elt in Split(Read(F)) | Regexp("^[0-9]+.[0-9]:\\[.*\\]$", elt)};
 else
     known := {};
