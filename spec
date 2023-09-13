@@ -2,6 +2,7 @@
   CremonaTrick.m
   Eigenvalues.m
   HeckeCharacters.m
+  Labels.m
   Lvalues.m
   PeriodMatrices.m
   TwistedLfunction.m

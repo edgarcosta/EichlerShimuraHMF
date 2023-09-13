@@ -43,48 +43,7 @@ intrinsic LoadEigenvalues(~f, filename : hasheader:=true)
 	end for;
 end intrinsic;
 
-intrinsic make_eigenform(label) -> ModFrmHilElt
-{ Create an eigenform from a label. }
-    d := StringToInteger(Split(label, ".")[3]);
-    norm := StringToInteger(Split(Split(label, "-")[2],".")[1]);
-    endlabel := Split(label, "-")[3];
-    R<x> := PolynomialRing(Integers());
-    if d eq 12 then
-        F<w> := NumberField(x^2 -3);
-        OF := Integers(F);
-        NN := [elt : elt in [(17*w - 17)*OF, (19*w - 19)*OF, (-23*w)*OF] | Norm(elt) eq norm][1];
-        labels := [elt[2] : elt in [
-        <578, ["c", "d"]>,
-        <722, ["i", "j", "l", "k"]>,
-        <1587, ["i", "j", "k", "l", "m", "n"]>] | elt[1] eq norm][1];
-		dim := 4;
-    elif d eq 8 then
-        F<w> := NumberField(x^2 -2);
-        OF := Integers(F);
-        NN := [elt : elt in [(51)*OF, (37*w)*OF] | Norm(elt) eq norm][1];
-        labels := [elt[2] : elt in [<2601, ["j", "k"]>, <2738, ["f", "e"]>] | elt[1] eq norm][1];
-		dim := 4;
-    elif d eq 24 then
-        F<w> := NumberField(x^2 -6);
-        OF := Integers(F);
-        NN := (-11*w)*OF;
-        labels := ["j", "i","l", "k"];
-		dim := 4;
-    elif d eq 5 then
-        assert label in ["2.2.5.1-61.2-a", "2.2.5.1-500.1-a", "2.2.5.1-500.1-b"];
-        F<w> := NumberField(x^2 - x - 1);
-        OF := Integers(F);
-        NN := [elt : elt in [(-3*w-7)*OF, (-20*w+10)*OF] | Norm(elt) eq norm ][1];
-        labels := [elt[2] : elt in [
-        <61, ["a"]>,
-        <500, ["a", "b"]>] | elt[1] eq norm][1];
-		dim := 2;
-    end if;
-    M := NewformDecomposition(NewSubspace(HilbertCuspForms(F, NN)));
-    possible := [* Eigenform(elt) : elt in M | Dimension(elt) eq dim *];
-    assert #possible eq #labels;
-    return possible[Index(labels, endlabel)];
-end intrinsic;
+
 
 procedure compute_eigenvalues(label, start, congclass, congmod, bound : known:={})
     f := 1;
