@@ -1,4 +1,4 @@
-AttachSpec("~/projects/spec");
+AttachSpec("~/projects/EichlerShimuraHMF/spec");
 AttachSpec("~/projects/CHIMP/CHIMP.spec");
 /*
 diff --git a/precompute.m b/opt/magma/current/package/Geometry/ModFrmHil/precompute.m
