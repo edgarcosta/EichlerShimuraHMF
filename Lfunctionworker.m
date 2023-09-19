@@ -2,7 +2,7 @@ AttachSpec("~/EichlerShimuraHMF/spec");
 AttachSpec("~/CHIMP/CHIMP.spec");
 assert(assigned(label));
 assert(assigned(B));
-f := make_eigenform(label);
+f := LMFDBHMF(label);
 B := StringToInteger(B);
 time LoadEigenvalues(~f, "~/eigenvalues/" cat label cat ".txt.fast": hasheader:=false);
 F := BaseField(Parent(f));

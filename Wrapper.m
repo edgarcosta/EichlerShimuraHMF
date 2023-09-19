@@ -65,7 +65,7 @@ end function;
 intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->.
 { Compute the period matrix à l'Oda }
 	// Find the L values
-	f := make_eigenform(label);
+	f := LMFDBHMF(label);
 	F := BaseField(Parent(f));
 	dim := Degree(HeckeEigenvalueField(Parent(f)));
 	chis, chi_signs, res := ComputeLValues(label, B, F : cores := cores, dim := dim);
