@@ -69,11 +69,11 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	F := BaseField(Parent(f));
 	dim := Degree(HeckeEigenvalueField(Parent(f)));
 	chis, chi_signs, res := ComputeLValues(label, B, F : cores := cores, dim := dim);
-	
+
 	// Do the Cremona trick
 	H := HeckeEigenvalueField(Parent(f));
 	res_Cremona := [* CremonaTrickWithEmbeddings(H, r : dim := dim) : r in res *];
-	
+
 	// Detect the cross product
 	cross_prod := [  res_Cremona[1][i]*res_Cremona[4][i]/res_Cremona[2][i]/res_Cremona[3][i]  : i in [1..Degree(H)]];
 	_<x> := PolynomialRing(Universe(cross_prod));
@@ -88,7 +88,7 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	assert(#potential_cross_prods eq 1);
 	cross_prod_H := potential_cross_prods[1];
 	cnum, cden := NumberFieldDivisors(cross_prod_H);
-	
+
 	// Find the taus and period matrices
 	possible_taus := [TausGuess(res_Cremona, dim, pnum, pden) : pnum in cnum, pden in cden];
 	fixed_taus := [[ FixTaus(F, tau) : tau in taus] : taus in possible_taus];

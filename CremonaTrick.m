@@ -45,7 +45,7 @@ function MatchRoots(H, poly, qs)
     end for;
 end function;
 
-intrinsic CremonaTrickWithEmbeddings(H,res_i : dim := 4)->.
+intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
 { Cremona's trick with embeddings. }
 	if #res_i lt 2 then
 		return [ res_i[1][k][1] : k in [1..dim] ];
