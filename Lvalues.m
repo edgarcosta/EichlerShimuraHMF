@@ -3,7 +3,9 @@ if not(assigned(StoredLValues)) then
 end if;
 
 intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4, dim := 4)->.
-{Compute (and store) L values for the form with label label over number field F, with characters up to bound B. Optionally the number of cores and the dimension of the form can be given as an argument.}
+{
+	Compute (and store) L values for the form with label over number field F, with characters up to bound B. Optionally the number of cores and the dimension of the form can be given as an argument.
+	}
 	isStored, storedValues := StoreIsDefined(StoredLValues, Sprintf("%m", <label, B, F>));
 	if isStored then
 		chis, chi_signs, res2 := Explode(storedValues);
@@ -18,7 +20,7 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 		// To kill all of them: do for session in $(screen -ls | grep -o '[0-9]*\.Child[0-9]*'); do screen -S "${session}" -X quit; done
 	end for;
 	Lvals := DistributedManager(socket, tasks : initial_results := [* *]);
-	
+
 	// Read out results: with the embeddings
 	res2 := [* *];
 	desired_signs := [ [1,1], [1,-1], [-1,1], [-1,-1] ];
@@ -53,6 +55,6 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 		Append(~res2, sign_res);
 	end for;
 	StoreSet(StoredLValues, Sprintf("%m", <label, B, F>), <chis, chi_signs, res2>);
-	
+
 	return chis, chi_signs, res2;
 end intrinsic;
