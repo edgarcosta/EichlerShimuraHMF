@@ -9,6 +9,9 @@ end function;*/
 
 function NumberFieldDivisors(x)
 	H := Parent(x);
+	if H eq Rationals() then
+		return [<d, Abs(Numerator(x)) div d> : d in Divisors(Numerator(Abs(x)))], [<d, Abs(Denominator(x)) div d> : d in Divisors(Denominator(Abs(x)))];
+	end if;
 	O := RingOfIntegers(H);
 	Ifact := Factorisation(ideal<O|x>);
 	xfact := [ <s,f[2]> where _,s := IsPrincipal(f[1]): f in Ifact ];
@@ -55,6 +58,7 @@ function FixTaus(F, taus)
 	for c in CartesianPower({0,1}, #Generators(U)) do
 		u := F!&*[phi(g)^c[i] : i->g in G];
 		u_signs := [-Sign(Real(Evaluate(u, rho))) : rho in InfinitePlaces(F)];
+		taus_signs := [Sign(Imaginary(tau)) : tau in taus];
 		if taus_signs eq u_signs then
 			return [taus[i]*Evaluate(u, rho) : i->rho in InfinitePlaces(F)];
 		end if;
@@ -91,7 +95,7 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	
 	// Find the taus and period matrices
 	possible_taus := [TausGuess(res_Cremona, dim, pnum, pden) : pnum in cnum, pden in cden];
-	fixed_taus := [[ FixTaus(F, tau) : tau in taus] : taus in possible_taus];
+	fixed_taus := [[ FixTaus(H, tau) : tau in taus] : taus in possible_taus];
 	PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in fixed_taus];
-	return PeriodMatrices, <cnum, cden>;
+	return <PeriodMatrices, <cnum, cden>, fixed_taus>;
 end intrinsic;

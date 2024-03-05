@@ -4,10 +4,11 @@ intrinsic NormBoundOnComputedEigenvalues(f::ModFrmHilElt : lower_bound:=1000) ->
     missing_evs := Set(PrimesUpTo(bound, BaseRing(Parent(f)))) diff Set(Keys(f`hecke_eigenvalues));
     // ignore bad primes
     missing_evs := missing_evs diff {pe[1] : pe in Factorization(Level(Parent(f)))};
-    if #missing_evs eq 0 then
+    norms := [Norm(elt) : elt in missing_evs | Norm(elt) gt lower_bound];
+    if #norms eq 0 then
         return bound;
     else
-       return Min([Norm(elt) : elt in missing_evs | Norm(elt) gt lower_bound]);
+       return Min(norms);
     end if;
 end intrinsic;
 

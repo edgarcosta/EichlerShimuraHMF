@@ -1,5 +1,8 @@
 function NumberFieldLCM(L)
 	K := Parent(L[1]);
+	if K eq Rationals() then
+		return LCM(ChangeUniverse(L, Integers()));
+	end if;
 	OK := Integers(K);
 	I := [OK*x : x in L];
 	_, a := IsPrincipal(&meet I);
@@ -8,6 +11,9 @@ end function;
 
 function NumberFieldGCD(L)
 	K := Parent(L[1]);
+	if K eq Rationals() then
+		return GCD(ChangeUniverse(L, Integers()));
+	end if;
 	OK := Integers(K);
 	I := [OK*x : x in L];
 	_, a := IsPrincipal(&+I);

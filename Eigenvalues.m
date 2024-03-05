@@ -1,11 +1,12 @@
-intrinsic WriteEigenvalues(f, filename) -> RngIntElt
+intrinsic WriteEigenvalues(f, filename : Overwrite := false) -> RngIntElt
 { Write eigenvalues to a file. }
+	if Overwrite then
+    	System("rm " cat filename);
+	end if;
     F := NumberField(Ring(Universe(Keys(f`hecke_eigenvalues))));
     keys := [k : k in Keys(f`hecke_eigenvalues)];
     labels := [[StringToInteger(elt) : elt in Split(LMFDBLabel(k), ".")] : k in keys];
     ParallelSort(~labels, ~keys);
-    header := StripWhiteSpace(Join([Sprint(Eltseq(DefiningPolynomial(elt))) : elt in [F, Parent(f`hecke_eigenvalues[keys[2]])]], ":"));
-    Write(filename, header : Overwrite:=true);
     for i->k in keys do
         label := Join([Sprint(elt) : elt in labels[i]], ".");
         eigenval := Sprint(Eltseq(f`hecke_eigenvalues[k]));
@@ -14,19 +15,15 @@ intrinsic WriteEigenvalues(f, filename) -> RngIntElt
     return #keys + 1;
 end intrinsic;
 
-intrinsic LoadEigenvalues(~f, filename : hasheader:=true)
+intrinsic LoadEigenvalues(~f, filename : hasheader := false)
 { Load the eigenvalues from a file. }
 	F<w> := BaseRing(Parent(f));
 	OF := Integers(F);
 	K := HeckeEigenvalueField(Parent(f));
 	coeffs := getrecs(filename);
-    if hasheader then
-	    assert StripWhiteSpace(Sprint(Eltseq(MinimalPolynomial(OF.2)))) eq coeffs[1][1];
-	    assert StripWhiteSpace(Sprint(Eltseq(DefiningPolynomial(HeckeEigenvalueField(Parent(f)))))) eq coeffs[1][2];
-        range := [1..#coeffs];
-    else
-        range := [1..#coeffs];
-    end if;
+
+    range := [1..#coeffs];
+
 	for i in range do
 		rec := coeffs[i];
         if "." in rec[1] then
@@ -43,4 +40,13 @@ intrinsic LoadEigenvalues(~f, filename : hasheader:=true)
 	end for;
 end intrinsic;
 
-
+intrinsic ConvertEigenvalues(label, path)
+{ }
+    f := LMFDBHMF(label);
+    LoadEigenvalues(~f, path cat label cat ".txt");
+    Write(path cat label cat ".txt.fast",
+        Join(
+            [StripWhiteSpace(Join([Sprint([Eltseq(g) : g in Generators(k)]),Sprint(Eltseq(v))], ":"))
+            :
+            k->v in f`hecke_eigenvalues],"\n") cat "\n" : Overwrite:=true);
+end intrinsic;
