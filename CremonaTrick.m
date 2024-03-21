@@ -89,5 +89,5 @@ intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
     end for;
 	//print L, [Norm(x) : x in L];
     GCD := NumberFieldGCD(L);
-    return [ res_i[1][k][1] * Evaluate(GCD, InfinitePlaces(H)[k]) : k in [1..dim]], GCD, Norm(GCD);
+    return [ res_i[1][k][1] * Evaluate(GCD, InfinitePlaces(H)[k]) : k in [1..dim]], L;
 end intrinsic;
