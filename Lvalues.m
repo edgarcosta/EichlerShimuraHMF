@@ -16,7 +16,8 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 	tasks := [<i,j> : i in [1..#chis], j in [1..dim]];
 	socket := Socket(: LocalHost := "localhost", LocalPort := 10000 + (Hash(label) mod 55000));
 	for i in [1..cores] do
-		System("screen -d -m -S Child" cat Sprint(i) cat " timeout -k 10 4h magma label:=" cat label cat " B:=" cat Sprint(B) cat " ~/EichlerShimuraHMF/Lfunctionworker.m"); // Alternatively, run "for i in {1..N}; do screen -d -m -S Child$i timeout -k 10 4h magma Lfunctionworker.m; done" in a terminal to start N workers.
+		System("screen -d -m -S Child" cat Sprint(i) cat " timeout -k 10 4h magma label:=" cat label cat " B:=" cat Sprint(B) cat " ~/EichlerShimuraHMF/Lfunctionworker.m");
+		// Alternatively, run "for i in {1..N}; do screen -d -m -S Child$i timeout -k 10 4h magma Lfunctionworker.m; done" in a terminal to start N workers.
 		// To kill all of them: do for session in $(screen -ls | grep -o '[0-9]*\.Child[0-9]*'); do screen -S "${session}" -X quit; done
 	end for;
 	Lvals := DistributedManager(socket, tasks : initial_results := [* *]);
