@@ -56,7 +56,7 @@ intrinsic LMFDBHMFwithEigenvalues(label, path : Convert:=true) -> ModFrmHilElt
 
   // file doesn't exist or the number of lines do not match
   bfast, fast := OpenTest(filenamefast, "r");
-  if bfast and #Split(Read(slow), "\n") ne #Split(Read(fast), "\n") then
+  if bfast and #Split(Read(slow), "\n") eq #Split(Read(fast), "\n") then
     LoadEigenvalues(~f, filenamefast);
     Convert := false;
   else
