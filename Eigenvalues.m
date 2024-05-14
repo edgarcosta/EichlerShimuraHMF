@@ -15,7 +15,7 @@ intrinsic WriteEigenvalues(f, filename : Overwrite:=false) -> RngIntElt
       ideal := Join([Sprint(elt) : elt in labels[i]], ".");
     end if;
     eigenval := Sprint(Eltseq(f`hecke_eigenvalues[k]));
-    Append(~output, Join([label, eigenval], ":"));
+    Append(~output, Join([ideal, eigenval], ":"));
   end for;
   Write(filename, Join(output, "\n") : Overwrite:=Overwrite);
   return #output;
