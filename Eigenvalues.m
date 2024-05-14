@@ -48,7 +48,7 @@ intrinsic LMFDBHMFwithEigenvalues(label, path : Convert:=true) -> ModFrmHilElt
   {Create an eigenform from a label and loads its precomputed eigenvalues}
   f := LMFDBHMF(label);
   filename := path cat label cat ".txt";
-  filenamefast := filename cat ".fast"
+  filenamefast := filename cat ".fast";
 
   // let's figure out if there is anything to do
   bslow, slow := OpenTest(filename, "r");
