@@ -9,6 +9,7 @@
  */
  
 // copied from reconstructing-g4/magma/theta.m
+/*
 intrinsic SiegelReduction(tau::AlgMatElt) -> Any
   {}
 
@@ -82,6 +83,7 @@ intrinsic SiegelReduction(tau::AlgMatElt) -> Any
     end if;
   end while;
 end intrinsic;
+*/
 
 // copied from reconstructing-g4/magma/schottky.m
 intrinsic SchottkyModularFormMagma(tau::AlgMatElt : prec := -1) -> Any
@@ -133,8 +135,25 @@ intrinsic SchottkyModularFormMagma(tau::AlgMatElt : prec := -1) -> Any
   return Schottky;
 end intrinsic;
 
+intrinsic ThetaCharacteristicToIndex(m::SeqEnum) -> RngIntElt
+  {Given a theta characteristic m as a sequence of length 2*g with entries in [0, 1/2], return
+  the index of the corresponding theta constant output by ThetaFlint}
+  
+  CC := Universe(m);
+  require &and[el in [CC | 0, 1/2] : el in m]: "entries must be 0 or 1/2";
+  m := Reverse([Integers()!(2*el) : el in m]);
+  return Seqint(m,2)+1;
+end intrinsic;
+
+intrinsic ThetaCharacteristicToIndex(m::ModMatFldElt) -> RngIntElt
+  {Given a theta characteristic m as a 1 by 2*g matrix with entries in [0, 1/2], return
+  the index of the corresponding theta constant output by ThetaFlint}
+  
+  return ThetaCharacteristicToIndex(Eltseq(m));
+end intrinsic;
+
 intrinsic SchottkyModularFormFlint(tau::AlgMatElt : prec := -1) -> Any
-  {}
+  {Compute the Schottky modular form evaluated at tau using Kieffer's implementation of theta functions in Flint}
   
   require (Nrows(tau) eq 4) and (Ncols(tau) eq 4): "period matrix must be 4 by 4";
   

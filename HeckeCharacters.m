@@ -1,5 +1,3 @@
-
-
 intrinsic QuadraticCharactersUpTo(B::RngIntElt, F::FldNum) -> List
 { All the Hecke characters of order at most with norm of the conductor bounded by B}
     // we use Conductor(elt) eq N as way to get only primitive characters

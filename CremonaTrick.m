@@ -53,6 +53,7 @@ end function;
 
 intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
 { Cremona's trick with embeddings. }
+	assert assigned H`CC;
 	if #res_i lt 2 then
 		return [ res_i[1][k][1] : k in [1..dim] ];
 	end if;
@@ -88,6 +89,6 @@ intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
 		Append(~L, MatchRoots(H, poly_QQ, qs));
 	end for;
 	//print L, [Norm(x) : x in L];
-	GCD := NumberFieldGCD(L);
-	return [ res_i[1][k][1] * Evaluate(GCD, InfinitePlaces(H)[k]) : k in [1..dim]], L;
+    gcd := NumberFieldGCD(L);
+    return [ res_i[1][k][1] * Evaluate(gcd, InfinitePlaces(H)[k]) : k in [1..dim]], L;
 end intrinsic;

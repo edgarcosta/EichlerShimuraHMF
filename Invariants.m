@@ -200,9 +200,9 @@ intrinsic E4Ratios(tau::AlgMatElt : extra_endos := true, m := false, flint := tr
 	end if;
 	Vs := OneDimensionalTwoTorsionSubspaces(E[2][2] : IncludeTrivial);
 	E4s := [EighthPowersSum(tau, v : m := m, flint := flint) : v in Vs];
-	E4s := [x/y : x in E4s[1..#E4s-1]] where y := E4s[#E4s]; // last one is E_4(tau)
+	E4rs := [x/y : x in E4s[1..#E4s-1]] where y := E4s[#E4s]; // last one is E_4(tau)
     //print E4s;
-	return E4s;
+	return E4rs, E4s;
 end intrinsic;
 
 
