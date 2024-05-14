@@ -65,7 +65,7 @@ intrinsic LMFDBHMFwithEigenvalues(label, path : Convert:=true) -> ModFrmHilElt
   delete slow;
   delete fast;
   if Convert then
-    WriteEigenvalues(f, fielnamefast);
+    WriteEigenvalues(f, filenamefast);
   end if;
   return f;
 end intrinsic;
