@@ -56,14 +56,14 @@ intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
 	if #res_i lt 2 then
 		return [ res_i[1][k][1] : k in [1..dim] ];
 	end if;
-    L := [H | 1];
-    for j := 2 to #res_i do
-        qs := [res_i[j][k][1]/res_i[1][k][1] : k in [1..dim]];
-        R<x> := PolynomialRing(Universe(qs));
-        poly := &*[x - q : q in qs];
-        cs := Eltseq(poly);
-        cs_QQ := [];
-        for c in cs do
+	L := [H | 1];
+	for j := 2 to #res_i do
+		qs := [res_i[j][k][1]/res_i[1][k][1] : k in [1..dim]];
+		R<x> := PolynomialRing(Universe(qs));
+		poly := &*[x - q : q in qs];
+		cs := Eltseq(poly);
+		cs_QQ := [];
+		for c in cs do
 			mp := MinimalPolynomial(c, 1);
 			bool := true;
 			if Degree(mp) ne 1 then
@@ -74,20 +74,20 @@ intrinsic CremonaTrickWithEmbeddings(H, res_i : dim := 4)->.
 					bool := false;
 				end if;
 			end if;
-            //bool, c_QQ := RationalReconstruction(ComplexFieldExtra(Precision(c)-2)!c);
-            if not bool then
+			//bool, c_QQ := RationalReconstruction(ComplexFieldExtra(Precision(c)-2)!c);
+			if not bool then
 				print "Character", j, "skipped as", c, "could not be recognised";
 				print poly;
 				print mp;
-                continue j;
-            end if;
-            Append(~cs_QQ, c_QQ);
-        end for;
-        QQt<t> := PolynomialRing(Rationals());
-        poly_QQ := QQt!cs_QQ;
-        Append(~L, MatchRoots(H, poly_QQ, qs));
-    end for;
+				continue j;
+			end if;
+			Append(~cs_QQ, c_QQ);
+		end for;
+		QQt<t> := PolynomialRing(Rationals());
+		poly_QQ := QQt!cs_QQ;
+		Append(~L, MatchRoots(H, poly_QQ, qs));
+	end for;
 	//print L, [Norm(x) : x in L];
-    GCD := NumberFieldGCD(L);
-    return [ res_i[1][k][1] * Evaluate(GCD, InfinitePlaces(H)[k]) : k in [1..dim]], L;
+	GCD := NumberFieldGCD(L);
+	return [ res_i[1][k][1] * Evaluate(GCD, InfinitePlaces(H)[k]) : k in [1..dim]], L;
 end intrinsic;

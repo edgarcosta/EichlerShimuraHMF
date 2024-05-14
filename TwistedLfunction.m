@@ -74,38 +74,38 @@ intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_p
     print [elt[2] : elt in res_pos2];
     print "###";
     if #res_pos eq 1 and #res_pos2 eq 1 then
-        return res_pos[1,2], res_pos[1,1];
+      return res_pos[1,2], res_pos[1,1];
     else
         return $$(f, chi: max_precision:=max_precision, Precision := Precision + 2, conductors:=conductors);
     end if;
 end intrinsic;
 
 intrinsic LSeriesTwisted(f::ModFrmHilElt, chi::GrpHeckeElt : Embedding:=1, Precision:=0, EC:=false, KnownConductor:=false) -> LSer
- { return the twisted L-series of the Hilbert modular newform f}
- Mf:= Parent(f);
- K := BaseRing(Mf);
- N := Level(Mf);
- WT := Weight(Mf);
- require assigned Mf`HeckeIrreducible and Mf`HeckeIrreducible:  "The argument must be a Hilbert modular newform (obtained from 'Eigenform')";
- require Type(DirichletCharacter(Mf)) eq RngIntElt: "Only trivial character is currently implemented";
- if Type(WT) eq RngIntElt then W:=[WT,WT]; else W:=Sort(Weight(Mf)); end if;
- w := W[#W];
- require &and[IsEven(w) : w in W] : "All weights must be even";
- require #SequenceToSet(W) eq 1: "Only parallel weight is currently implemented";
- E := HeckeEigenvalueField(Mf);
- A := AbsoluteField(E);
- r, c := Signature(A);
- RF := c eq 0 select RealField else ComplexField;
- prec := (Precision eq 0) select GetPrecision(RF()) else Precision;
- R1<T> := PowerSeriesRing(Integers(),1+2*Degree(K));
- ip := InfinitePlaces(A)[Embedding];
- twist := chi;
+{ return the twisted L-series of the Hilbert modular newform f}
+Mf:= Parent(f);
+K := BaseRing(Mf);
+N := Level(Mf);
+WT := Weight(Mf);
+require assigned Mf`HeckeIrreducible and Mf`HeckeIrreducible:  "The argument must be a Hilbert modular newform (obtained from 'Eigenform')";
+require Type(DirichletCharacter(Mf)) eq RngIntElt: "Only trivial character is currently implemented";
+if Type(WT) eq RngIntElt then W:=[WT,WT]; else W:=Sort(Weight(Mf)); end if;
+w := W[#W];
+require &and[IsEven(w) : w in W] : "All weights must be even";
+require #SequenceToSet(W) eq 1: "Only parallel weight is currently implemented";
+E := HeckeEigenvalueField(Mf);
+A := AbsoluteField(E);
+r, c := Signature(A);
+RF := c eq 0 select RealField else ComplexField;
+prec := (Precision eq 0) select GetPrecision(RF()) else Precision;
+R1<T> := PowerSeriesRing(Integers(),1+2*Degree(K));
+ip := InfinitePlaces(A)[Embedding];
+twist := chi;
 
- function cfK(p, d : Precision:=prec)
+function cfK(p, d : Precision:=prec)
   fp := Degree(p);
   P := Norm(p);
   if fp gt d then
-   return 1+O(T^(d+1));
+    return 1+O(T^(d+1));
   end if;
 
   if Degree(A) eq 1 then
@@ -126,11 +126,11 @@ intrinsic LSeriesTwisted(f::ModFrmHilElt, chi::GrpHeckeElt : Embedding:=1, Preci
   tp := twist(p);
   _<U> := PolynomialRing(Parent(ap));
   return 1 - ap*tp*(U^fp) + eps*tp^2*P^(w-1)*U^(2*fp);
- end function;
+end function;
 
- function cf(p,d : Precision:=prec) // need prec compatible
+function cf(p,d : Precision:=prec) // need prec compatible
   return &*[cfK(f[1],d : Precision:=Precision) : f in Factorization(p*Integers(K)) ];
- end function;
+end function;
 
  name:=<"L-series of ",f," twisted">;
  gamma:=&cat[[0-e,1-e] where e:=(w-W[i]) div 2 : i in [1..Degree(K)]];
