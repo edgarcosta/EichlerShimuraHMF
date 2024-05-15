@@ -42,7 +42,7 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 				// pick the right
 				entry := [x : x in Lvals | x[1] eq j and x[2] eq emb][1];
 				_, _, special, err, error_message := Explode(entry);
-				if error_message ne 0 then
+				if #error_message ne 0 then
 					// Something went wrong for this combination, and we report it via print
 					print <j, s>, entry[5];
 					continue;
