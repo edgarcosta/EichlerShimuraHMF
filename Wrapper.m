@@ -68,34 +68,44 @@ end function;
 
 intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->.
 { Compute the period matrix à l'Oda }
-	// Find the L values
-	f := LMFDBHMF(label);
-	F := BaseField(Parent(f));
-	dim := Degree(HeckeEigenvalueField(Parent(f)));
-	chis, chi_signs, res := ComputeOmegaValues(label, B : cores:=cores);
+// Find the Omega values
+	chis, chi_signs, values, skipped := ComputeOmegaValues(label, B : cores:=cores);
 
+	Omegas_per_sign := [* [* elt[2] : elt in r *] : r in values *];
 	// Do the Cremona trick
 	H := HeckeEigenvalueField(Parent(f));
-	res_Cremona := [* CremonaTrickWithEmbeddings(H, r : dim := dim) : r in res *];
+	Omegas := [* CremonaTrickWithEmbeddings(H, r) : r in Omegas_per_sign *];
 
 	// Detect the cross product
-	cross_prod := [  res_Cremona[1][i]*res_Cremona[4][i]/res_Cremona[2][i]/res_Cremona[3][i]  : i in [1..Degree(H)]];
+	cross_prod := [  Omegas[1][i]*Omegas[4][i]/Omegas[2][i]/Omegas[3][i]  : i in [1..Degree(H)]];
 	_<x> := PolynomialRing(Universe(cross_prod));
 	cross_pol := &*[x-c : c in cross_prod];
+	// RationalReconstruction returns a boolean, and the approximation x
+	// the boolean = AlmostEqual(x, input), ie, x is a good approximation
 	coeffs_Q := [<a,b> where a,b := RationalReconstruction(ComplexFieldExtra(Precision(c)) ! c) : c in Coefficients(cross_pol)];
+	// check that we got good approximation
 	assert(not(false in {x[1] : x in coeffs_Q}));
+	// Now construct the polynomial over Q
 	RQ<xQ> := PolynomialRing(Rationals());
 	cross_pol_Q := RQ![x[2] : x in coeffs_Q];
-	assert(#Factorisation(cross_pol_Q) eq 1);
-	cross_pol_Q := Factorisation(cross_pol_Q)[1][1];
-	potential_cross_prods := [r[1] : r in Roots(cross_pol_Q, H) | Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..dim]]) lt eps];
-	assert(#potential_cross_prods eq 1);
-	cross_prod_H := potential_cross_prods[1];
+	// we check that is a power of an irreducible polynomial
+	fact := Factorisation(cross_pol_Q);
+	assert(#fact eq 1);
+	// take its radical, i.e., the irreducible polynomial
+	cross_pol_Q := fact[1][1];
+
+	// pick the root that matches the complex embeddings of H
+	eps := 1E-6; // FIXME, maybe sort by the difference?
+	roots := Roots(cross_pol_Q, H);
+	differences := [Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..dim]]) : r in roots];
+	ParallelSort(~differences, ~roots);
+	assert differences[1]/differences[2] lt 10^(-Precision(Universe(differences))*0.5);
+	cross_prod_H := roots[1,1];
 	cnum, cden := NumberFieldDivisors(cross_prod_H);
 
 	// Find the taus and period matrices
-	possible_taus := [TausGuess(res_Cremona, dim, pnum, pden) : pnum in cnum, pden in cden];
+	possible_taus := [TausGuess(Omegas, dim, pnum, pden) : pnum in cnum, pden in cden];
 	fixed_taus := [[ FixTaus(H, tau) : tau in taus] : taus in possible_taus];
 	PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in fixed_taus];
-	return <PeriodMatrices, <cnum, cden>, fixed_taus>;
+		return <PeriodMatrices, <cnum, cden>, fixed_taus>;
 end intrinsic;
