@@ -72,7 +72,7 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	f := LMFDBHMF(label);
 	F := BaseField(Parent(f));
 	dim := Degree(HeckeEigenvalueField(Parent(f)));
-	chis, chi_signs, res := ComputeOmegaValues(label, B, F : cores := cores, dim := dim);
+	chis, chi_signs, res := ComputeOmegaValues(label, B : cores:=cores);
 
 	// Do the Cremona trick
 	H := HeckeEigenvalueField(Parent(f));
