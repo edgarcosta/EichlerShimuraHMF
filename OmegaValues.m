@@ -79,7 +79,6 @@ intrinsic ComputeOmegaValues(label::MonStgElt, B::RngIntElt : cores:=4)->.
     Append(~res2, sign_res);
   end for;
 
-
   StoreSet(StoredOmegaValues, label, <B, chis, chi_signs, res2, skipped>);
   return chis, chi_signs, res2, skipped;
 end intrinsic;
