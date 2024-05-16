@@ -51,15 +51,16 @@ function MatchRoots(H, poly, qs)
 	end for;
 end function;
 
-intrinsic CremonaTrickWithEmbeddings(H::Any, res_i::Any : dim := 4) -> Any
-	{ Cremona's trick with embeddings. }
-	assert assigned H`CC;
-	if #res_i lt 2 then
-		return [ res_i[1][k][1] : k in [1..dim] ];
-	end if;
+intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> FldComElt[], FldNumElt[]
+  { Cremona's trick with embeddings. }
+	require #omegas ge 1: "Omegas cannot be empty"
+	dim := Degree(H);
 	L := [H | 1];
-	for j := 2 to #res_i do
-		qs := [res_i[j][k][1]/res_i[1][k][1] : k in [1..dim]];
+    if #Omegas eq 1 then
+		return Omegas[1], [H | 1];
+	end if;
+	for j:=2 to #Omegas do
+		qs := [Omegas[j][k]/Omegas[1][k] : k in [1..dim]];
 		R<x> := PolynomialRing(Universe(qs));
 		poly := &*[x - q : q in qs];
 		cs := Eltseq(poly);
@@ -70,7 +71,7 @@ intrinsic CremonaTrickWithEmbeddings(H::Any, res_i::Any : dim := 4) -> Any
 			if Degree(mp) ne 1 then
 				bool := false;
 			else
-				c_QQ := - Coefficients(mp)[1] / Coefficients(mp)[2];
+				c_QQ := -Coefficients(mp)[1] / Coefficients(mp)[2];
 				if Abs(c_QQ - c) gt 1/Abs(Coefficients(mp)[2])^3 then
 					bool := false;
 				end if;
@@ -88,7 +89,6 @@ intrinsic CremonaTrickWithEmbeddings(H::Any, res_i::Any : dim := 4) -> Any
 		poly_QQ := QQt!cs_QQ;
 		Append(~L, MatchRoots(H, poly_QQ, qs));
 	end for;
-	//print L, [Norm(x) : x in L];
 	gcd := NumberFieldGCD(L);
-	return [ res_i[1][k][1] * Evaluate(gcd, InfinitePlaces(H)[k]) : k in [1..dim]], L;
+	return [ Omegas[1][k] * Evaluate(gcd, InfinitePlaces(H)[k]) : k in [1..dim]], L;
 end intrinsic;
