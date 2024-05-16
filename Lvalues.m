@@ -1,16 +1,26 @@
-if not(assigned(StoredLValues)) then
-	StoredLValues := NewStore();
+if not(assigned(StoredOmegaValues)) then
+	StoredOmegaValues := NewStore();
 end if;
 
-intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4, dim := 4)->.
+intrinsic ComputeOmegaValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4)->.
 {
-	Compute (and store) L values for the form with label over number field F, with characters up to bound B. Optionally the number of cores and the dimension of the form can be given as an argument.
+	Compute (and store) Omega values for the form with label over number field F, with characters up to bound B. Optionally the number of cores.
+	Returns the list of characters, their signs, and a list of four lists aligned with the signs [ [1,1], [1,-1], [-1,1], [-1,-1] ]
+	// each list has elements has a triple
+	// 1. index of the character chi in the SeqEnum chis
+	// 2. A sequence of Omega_f,chi for each embedding of f
+	// 3. A sequence of CFENew(L(f, chi)) for each embedding of f
 	}
-	isStored, storedValues := StoreIsDefined(StoredLValues, Sprintf("%m", <label, B, F>));
+	isStored, storedValues := StoreIsDefined(StoredOmegaValues, label);
 	if isStored then
-		chis, chi_signs, res2 := Explode(storedValues);
-		return chis, chi_signs, res2;
+		Bstored, chis, chi_signs, res2, skipped := Explode(storedValues);
+		if Bstored ge B then
+			return chis, chi_signs, res2, skipped;
+		end if;
 	end if;
+	f := LMFDBHMF(label);
+	dim := Dimension(Parent(f));
+	F := BaseField(Parent(f));
 	chis := QuadraticCharactersUpTo(B, F);
 	chi_signs := [HodgeSigns(chi) : chi in chis];
 	tasks := [<i,j> : i in [1..#chis], j in [1..dim]];
@@ -52,7 +62,7 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 					CC := ComplexFieldExtra(prec);
 					special := CC!special;
 					omega := -4*Pi(CC)^2*Sqrt(CC!2)*GaussSumOdaSimpleModuloSign(chis[j], chi_signs[j], CC)*special;
-					Append(~chi_res, <omega, j, Abs(err)>);
+					Append(~chi_res, <omega,  Abs(err)>);
 				else
 					// the special value is too close to zero
 					Append(~skipped, entry);
@@ -61,13 +71,15 @@ intrinsic ComputeLValues(label::MonStgElt, B::RngIntElt, F::FldNum : cores := 4,
 				end if;
 			end for;
 			if #chi_res eq dim then
-				// we are done looping over embeddings
-				Append(~sign_res, chi_res);
+				// we are done looping over embeddings, and we got all the embeddings
+				// chi_res is a list of <omega, Abs(err)> for each embedding
+				Append(~sign_res, <j, <elt[1] : elt in chi_res>, <elt[2] : elt in chi_res> > );
 			end if;
 		end for;
 		Append(~res2, sign_res);
 	end for;
-	StoreSet(StoredLValues, Sprintf("%m", <label, B, F>), <chis, chi_signs, res2, skipped>);
 
+
+	StoreSet(StoredOmegaValues, label, <B, chis, chi_signs, res2, skipped>);
 	return chis, chi_signs, res2, skipped;
 end intrinsic;
