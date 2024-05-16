@@ -51,7 +51,7 @@ function MatchRoots(H, poly, qs)
   end for;
 end function;
 
-intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> FldComElt[], FldNumElt[]
+intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComElt], SeqEnum[FldNumElt]
   { Cremona's trick with embeddings. }
   require #omegas ge 1: "Omegas cannot be empty"
   dim := Degree(H);
