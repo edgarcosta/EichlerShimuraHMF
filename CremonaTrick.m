@@ -53,7 +53,7 @@ end function;
 
 intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComElt], SeqEnum[FldNumElt]
   { Cremona's trick with embeddings. }
-  require #omegas ge 1: "Omegas cannot be empty"
+  require #omegas ge 1: "Omegas cannot be empty";
   dim := Degree(H);
   L := [H | 1];
     if #Omegas eq 1 then
