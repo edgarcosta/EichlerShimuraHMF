@@ -5,7 +5,7 @@
   HeckeCharacters.m
   Invariants.m
   Labels.m
-  Omegavalues.m
+  OmegaValues.m
   PeriodMatrices.m
   schottky-fast-theta.m
   TwistedLfunction.m
