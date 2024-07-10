@@ -68,11 +68,6 @@ intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_p
     threshold := 10^(-Precision*1.0/3);
     res_pos := [elt : elt in res | elt[1] lt threshold];
     res_pos2 := [elt : elt in res | elt[1] lt threshold^2];
-    print Precision, conductors;
-    print res;
-    print [elt[2] : elt in res_pos];
-    print [elt[2] : elt in res_pos2];
-    print "###";
     if #res_pos eq 1 and #res_pos2 eq 1 then
       return res_pos[1,2], res_pos[1,1];
     else
