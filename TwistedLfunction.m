@@ -1,3 +1,4 @@
+freeze;
 intrinsic NormBoundOnComputedEigenvalues(f::ModFrmHilElt : lower_bound:=1000) -> RngIntElt
     { the retuns N such that a_p(f) < N has been computed and p is a good prime}
     bound := Max([Norm(elt) : elt in Keys(f`hecke_eigenvalues) | elt ne 0*elt]);

@@ -1,3 +1,5 @@
+freeze;
+
 intrinsic WriteEigenvalues(f, filename : Overwrite:=false) -> RngIntElt
 { Write eigenvalues to a file. }
   F := NumberField(Ring(Universe(Keys(f`hecke_eigenvalues))));
@@ -28,19 +30,14 @@ intrinsic LoadEigenvalues(~f, filename)
   OF := Integers(F);
   K := HeckeEigenvalueField(Parent(f));
   coeffs := getrecs(filename);
-  for i in [1..#coeffs] do
-    rec := coeffs[i];
-    if "." in rec[1] then
-      ideal := LMFDBIdeal(OF, rec[1]);
-    else
-      ideal := ideal<OF | [OF!g : g in eval rec[1]]>;
-    end if;
-    if IsZero(ideal) then continue; end if;
-    try
-      f`hecke_eigenvalues[ideal] := K!eval rec[2];
-    catch e
-      print "Could not process", rec;
-    end try;
+
+  to_ideal := "." in coeffs[1,1]  select func<elt | LMFDBIdeal(OF, elt)> else func<elt | ideal<OF | [OF!g : g in atoiii(elt)]>>;
+
+  to_ev := func<elt | K!StringToRationalArray(elt)>;
+  evs := [<to_ideal(rec[1]), to_ev(rec[2])> : rec in coeffs];
+  for elt in evs do
+    //if IsZero(elt[1]) then continue; end if;
+    f`hecke_eigenvalues[elt[1]] := elt[2];
   end for;
 end intrinsic;
 

@@ -1,3 +1,5 @@
+freeze;
+
 if not(assigned(StoredOmegaValues)) then
   StoredOmegaValues := NewStore();
 end if;

@@ -1,3 +1,4 @@
+freeze;
 /***
  *  Reconstructing genus 4 curves
  *

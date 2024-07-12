@@ -1,3 +1,5 @@
+freeze;
+
 intrinsic LMFDBField(label::MonStgElt) -> FldNum
   {Given an LMFDB label for a number field, return that field}
   deg, r, D, i := Explode([StringToInteger(el) : el in Split(label, ".")]);

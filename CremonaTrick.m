@@ -1,3 +1,4 @@
+freeze;
 function NumberFieldLCM(L)
   K := Parent(L[1]);
   if K eq Rationals() then

@@ -1,3 +1,4 @@
+freeze;
 /*function AlternativeRationalReconstruction(x)
 	f := MinimalPolynomial(x, 1);
 	y := Roots(f, Rationals())[1][1];

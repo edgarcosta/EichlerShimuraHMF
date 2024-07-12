@@ -1,3 +1,4 @@
+freeze;
 /*
 Old functions that resulted in pairing in the inverse different or something instead of ZZ
 

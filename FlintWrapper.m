@@ -1,3 +1,5 @@
+freeze;
+
 function mktemp()
     return Split(Pipe("mktemp", ""), "\n")[1];
 end function;
