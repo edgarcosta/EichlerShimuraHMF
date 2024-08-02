@@ -31,12 +31,24 @@ function ThetaFunctions(tau)
         : c in CartesianPower({CC|0,1/2},2*g) ];
 end function;
 
-// this uses Jean's implementation of theta functions in Flint
+/*
+// this uses Jean's implementation of theta functions in Flint via FlintWrapper.m
 function ThetaFunctionsFlint(tau)
     g := Nrows(tau);
     CC<I> := BaseRing(Parent(tau));
     return map< KMatrixSpace(CC,g,1)-> KMatrixSpace(CC,2^(2*g),1) |
         z :-> ThetaFlint(Matrix([[0]]), z, tau)>;
+end function;
+*/
+
+// this uses Magma's implementation of theta functions
+function ThetaFunctions(tau)
+    g := Nrows(tau);
+    CC<I> := BaseRing(Parent(tau));
+    return [map< KMatrixSpace(CC,g,1)->CC |
+        z :-> ThetaFlint(m, z, tau)>
+        where m := Matrix(2*g,1, [c[i] : i in [1..2*g]])
+        : c in CartesianPower({CC|0,1/2},2*g) ];
 end function;
 
 /*
