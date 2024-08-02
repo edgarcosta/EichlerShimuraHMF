@@ -1,7 +1,7 @@
 {
   CremonaTrick.m
   Eigenvalues.m
-  FlintWrapper.m
+#  FlintWrapper.m
   HeckeCharacters.m
   Invariants.m
   Labels.m
