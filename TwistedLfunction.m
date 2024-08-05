@@ -13,16 +13,16 @@ intrinsic NormBoundOnComputedEigenvalues(f::ModFrmHilElt : lower_bound:=1000) ->
     end if;
 end intrinsic;
 
-intrinsic MaximizePrecision(~L, maxn)
+intrinsic MaxPrecision(L, maxn) -> .
     { maximize precision assuming using only the a_n for n <= N }
-    prec := 1;
+    prec := 0;
     while LCfRequired(L : Precision:=prec+1) le maxn do
         prec +:=1;
     end while;
-    LSetPrecision(L, prec);
+    return prec;
 end intrinsic;
 
-intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_precision:=false, EC:=false, conductors:=false) -> RngIntelt, FldReElt
+intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_precision:=false, maxn:= false, EC:=false, conductors:=false) -> RngIntelt, FldReElt
   { Using the functional equation compute the possible conductor }
     /*
      We guess the conductor with assumption that it is easy to compute ap for p <= max{n : an computed}
@@ -49,21 +49,20 @@ intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_p
         return conductors[1], 0;
     end if;
     if max_precision cmpeq false then
-        if not EC cmpeq false then
+        if EC cmpne false then
             max_precision := 100;
-        elif assigned f`hecke_eigenvalues and #Keys(f`hecke_eigenvalues) ne 0 then
-            maxn := NormBoundOnComputedEigenvalues(f);
+        else 
+            if maxn cmpeq false then
+                maxn := NormBoundOnComputedEigenvalues(f);
+            end if;
             L := LSeriesTwisted(f, chi : KnownConductor := conductors[1]);
-            MaximizePrecision(~L, maxn);
-            max_precision := L`precision;
-        else
-            error "No eigenvalues have been computed and no Elliptic curve has been attached to quickly generate them";
+            max_precision := MaxPrecision(L, maxn);
         end if;
     end if;
     if Precision gt max_precision then
         error "Not enough eigenvalues computed to pin down the conductor";
     end if;
-    
+
     res := Sort([<CFENew(LSeriesTwisted(f, chi : KnownConductor:=c, Precision:=Precision, EC:=EC)), c>  : c in conductors ]);
     // filter obvious out
     threshold := 10^(-Precision*1.0/3);
@@ -72,11 +71,11 @@ intrinsic GuessConductor(f::ModFrmHilElt, chi::GrpHeckeElt : Precision:=4, max_p
     if #res_pos eq 1 and #res_pos2 eq 1 then
       return res_pos[1,2], res_pos[1,1];
     else
-        return $$(f, chi: max_precision:=max_precision, Precision := Precision + 2, conductors:=conductors);
+        return $$(f, chi: max_precision:=max_precision, Precision:=Precision + 2, conductors:=conductors);
     end if;
 end intrinsic;
 
-intrinsic LSeriesTwisted(f::ModFrmHilElt, chi::GrpHeckeElt : Embedding:=1, Precision:=0, EC:=false, KnownConductor:=false) -> LSer
+intrinsic LSeriesTwisted(f::ModFrmHilElt, chi::GrpHeckeElt : Embedding:=1, Precision:=0, EC:=false, KnownConductor:=false, maxn:=false) -> LSer
 { return the twisted L-series of the Hilbert modular newform f}
 Mf:= Parent(f);
 K := BaseRing(Mf);
@@ -96,6 +95,7 @@ prec := (Precision eq 0) select GetPrecision(RF()) else Precision;
 R1<T> := PowerSeriesRing(Integers(),1+2*Degree(K));
 ip := InfinitePlaces(A)[Embedding];
 twist := chi;
+
 
 function cfK(p, d : Precision:=prec)
   fp := Degree(p);
@@ -131,7 +131,7 @@ end function;
  name:=<"L-series of ",f," twisted">;
  gamma:=&cat[[0-e,1-e] where e:=(w-W[i]) div 2 : i in [1..Degree(K)]];
  if KnownConductor cmpeq false then
-   KnownConductor := GuessConductor(f, chi : EC:=EC);
+   KnownConductor := GuessConductor(f, chi : EC:=EC, maxn:=maxn);
  end if;
  L:=LSeries(
      w,
@@ -148,3 +148,5 @@ end function;
 
  return L;
 end intrinsic;
+
+
