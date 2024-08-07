@@ -149,4 +149,18 @@ end function;
  return L;
 end intrinsic;
 
+intrinsic LMFDBTwistedLvalue(label, eigenvalues_dir, conductor_bnd, char_index, embedding : maxn:=false) -> Tup
+{ L(f, chi)(1) and Abs(root_number) - 1 }
+  f := LMFDBHMFwithEigenvalues(label, eigenvalues_dir);
+  F := BaseField(Parent(f));
+  chi := QuadraticCharactersUpTo(conductor_bnd, F)[char_index];
+  if maxn cmpeq false then
+    maxn := NormBoundOnComputedEigenvalues(f);
+  end if;
+  L := LSeriesTwisted(f, chi : Embedding:=embedding, maxn:=maxn);
+  LSetPrecision(L, MaxPrecision(L, maxn));
+  err := CFENew(L);
+  special := Evaluate(L, 1);
+  return special, err;
+end intrinsic;
 
