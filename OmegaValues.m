@@ -46,7 +46,7 @@ intrinsic ComputeSpecialValues(cores::RngIntElt, label::MonStgElt, eigenvalues_d
   isStored, storedValues := StoreIsDefined(SpecialValuesStore, label);
   if isStored then
     Bstored, maxnstored, res := Explode(storedValues);
-    if Bstored ge B and (maxnstored cmpeq false or (maxn cmpne false and maxnstored ge maxn) then
+    if Bstored ge B and (maxnstored cmpeq false or (maxn cmpne false and maxnstored ge maxn)) then
       return res;
     end if;
   end if;
