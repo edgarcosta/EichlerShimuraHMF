@@ -1,16 +1,16 @@
 freeze;
 intrinsic NormBoundOnComputedEigenvalues(f::ModFrmHilElt : lower_bound:=1000) -> RngIntElt
-    { the retuns N such that a_p(f) < N has been computed and p is a good prime}
-    bound := Max([Norm(elt) : elt in Keys(f`hecke_eigenvalues) | elt ne 0*elt]);
-    missing_evs := Set(PrimesUpTo(bound, BaseRing(Parent(f)))) diff Set(Keys(f`hecke_eigenvalues));
-    // ignore bad primes
-    missing_evs := missing_evs diff {pe[1] : pe in Factorization(Level(Parent(f)))};
-    norms := [Norm(elt) : elt in missing_evs | Norm(elt) gt lower_bound];
-    if #norms eq 0 then
-        return bound;
-    else
-       return Min(norms);
-    end if;
+  { the retuns N such that a_p(f) < N has been computed and p is a good prime}
+  bound := Max([Norm(elt) : elt in Keys(f`hecke_eigenvalues) | elt ne 0*elt]);
+  missing_evs := Set(PrimesUpTo(bound, BaseRing(Parent(f)))) diff Set(Keys(f`hecke_eigenvalues));
+  // ignore bad primes
+  missing_evs := missing_evs diff {pe[1] : pe in Factorization(Level(Parent(f)))};
+  norms := [Norm(elt) : elt in missing_evs | Norm(elt) gt lower_bound];
+  if #norms eq 0 then
+    return bound;
+  else
+   return Min(norms);
+  end if;
 end intrinsic;
 
 intrinsic MaxPrecision(L, maxn) -> .
