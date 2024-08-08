@@ -100,7 +100,7 @@ intrinsic ComputeOmegaValues(cores::RngIntElt, label::MonStgElt, eigenvalues_dir
         // pick the right
         entry := [x : x in Lvals | x[1] eq j and x[2] eq emb];
         assert #entry eq 1;
-        _, _, special, err, error_message := Explode(entry);
+        _, _, special, err, error_message := Explode(entry[1]);
         if #error_message ne 0 then
           // Something went wrong for this combination, and we report it via print
           print <j, s>, entry[5];
