@@ -26,7 +26,7 @@ function GetLvaluePIPE(label, B, char_index, embedding, eigenvalues_dir : maxn:=
       err := false;
       msg := e;
     end try;
-    Sprintf(\"%m\", < char_index, embedding, special, msg,  Time(start)>);
+    Sprintf(\"%m\", < char_index, embedding, special, err, msg,  Time(start)>);
     exit;"
   ];
   return Join(cmd, "\n");
@@ -42,7 +42,6 @@ intrinsic ComputeSpecialValues(cores::RngIntElt, label::MonStgElt, eigenvalues_d
   - CFENew(L(f, chi)), i.e., how far the root number is from Norm 1
   - the error message of any error
   - time to compute all this
-  - error message
   }
   isStored, storedValues := StoreIsDefined(SpecialValuesStore, label);
   if isStored then
@@ -105,7 +104,7 @@ intrinsic ComputeOmegaValues(cores::RngIntElt, label::MonStgElt, eigenvalues_dir
         _, _, special, err, error_message := Explode(entry);
         if #error_message ne 0 then
           // Something went wrong for this combination, and we report it via print
-          print <j, s>, entry[6];
+          print <j, s>, entry[5];
           continue;
         end if;
         prec := Precision(special);
