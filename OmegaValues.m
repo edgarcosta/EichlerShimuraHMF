@@ -35,13 +35,14 @@ end function;
 intrinsic ComputeSpecialValues(cores::RngIntElt, label::MonStgElt, eigenvalues_dir::MonStgElt, B::RngIntElt : maxn:=false) -> List
 {
   Compute (and store) L(sigma(f), chi)(1) values for the form with label over number field F, with characters up to bound B.
-  Returns a list of tuples. Each tuple has 5 elements:
+  Returns a list of tuples. Each tuple has 6 elements:
   - chi
   - embedding index
   - L(sigma(f), chi)(1)
   - CFENew(L(f, chi)), i.e., how far the root number is from Norm 1
   - the error message of any error
   - time to compute all this
+  - error message
   }
   isStored, storedValues := StoreIsDefined(SpecialValuesStore, label);
   if isStored then
@@ -104,7 +105,7 @@ intrinsic ComputeOmegaValues(cores::RngIntElt, label::MonStgElt, eigenvalues_dir
         _, _, special, err, error_message := Explode(entry);
         if #error_message ne 0 then
           // Something went wrong for this combination, and we report it via print
-          print <j, s>, entry[5];
+          print <j, s>, entry[6];
           continue;
         end if;
         prec := Precision(special);
