@@ -85,7 +85,7 @@ intrinsic ComputeOmegaValues(cores::RngIntElt, label::MonStgElt, eigenvalues_dir
   // 4. CFENew(L(f, chi)), i.e., how far the root number is from Norm 1
   // 5. The error message of any error
   // 6. time of the computation
-  Lvals := ComputeSpecialValues(cores, label, eigenvalues_dir, B : maxn:=false);
+  Lvals := ComputeSpecialValues(cores, label, eigenvalues_dir, B : maxn:=maxn);
 
   // Read out results: with the embeddings
   res2 := [* *];
