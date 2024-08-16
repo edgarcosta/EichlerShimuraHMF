@@ -22,7 +22,7 @@ function NumberFieldGCD(L)
 end function;
 
 intrinsic CremonaTrick(rec)->.
-  { Cremona's trick. }
+  { Cremona's trick, try to factor out common algebraic factors }
   if #rec lt 2 then
     return rec[1][1];
   end if;
@@ -53,7 +53,7 @@ function MatchRoots(H, poly, qs)
 end function;
 
 intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComElt], SeqEnum[FldNumElt]
-  { Cremona's trick with embeddings. }
+  { Cremona's trick with embeddings, i.e., factor out common algebraic factors defined over H }
   require #Omegas ge 1: "Omegas cannot be empty";
   dim := Degree(H);
   L := [H | 1];

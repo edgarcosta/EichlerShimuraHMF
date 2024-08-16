@@ -141,8 +141,8 @@ intrinsic ThetaCharacteristicToIndex(m::SeqEnum) -> RngIntElt
   the index of the corresponding theta constant output by ThetaFlint}
   
   CC := Universe(m);
-  require &and[el in [CC | 0, 1/2] : el in m]: "entries must be 0 or 1/2";
-  m := Reverse([Integers()!(2*el) : el in m]);
+  //require &and[el in [CC | 0, 1/2] : el in m]: "entries must be 0 or 1/2";
+  m := Reverse([Integers()!(2*el) mod 2 : el in m]);
   return Seqint(m,2)+1;
 end intrinsic;
 
