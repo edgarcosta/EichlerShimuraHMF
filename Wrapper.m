@@ -1,12 +1,4 @@
 freeze;
-/*function AlternativeRationalReconstruction(x)
-	f := MinimalPolynomial(x, 1);
-	y := Roots(f, Rationals())[1][1];
-	if Abs(x-y) lt 1/(10*Denominator(y)^2) then
-		return true, y;
-	end if;
-	return false, 0;
-end function;*/
 
 function NumberFieldDivisors(x)
 	H := Parent(x);
@@ -31,35 +23,48 @@ function NumberFieldDivisors(x)
 	return num_fact, den_fact;
 end function;
 
-function TausGuess(res_Cremona, dim, pnum, pden)
+function ComputeModuliPoint(Omegas, pnum, pden)
+    // given a possible numerator and denominator that will satistfy the Riemann--Hodge relation
+    // compute the possible pair of taus
 	H := Parent(pnum[1]);
+    dim := Degree(H);
 	mod_factors := [pden[1], pnum[1], pnum[2], pden[2]];
+    // fix Omegas accordingly
 	for i in [1..dim] do
 		for j in [1..4] do
-			res_Cremona[j][i] *:= Evaluate(mod_factors[j], InfinitePlaces(H)[i]);
+			Omegas[j][i] *:= Evaluate(mod_factors[j], InfinitePlaces(H)[i]);
 		end for;
 	end for;
-	m, i := Min([Precision(Universe(r)) : r in res_Cremona]);
+    // we now compute Omega_{-+}/Omega_{++}, Omega_{+-}/Omega_{++}
+    // i.e. Omegas[3]/Omegas[1] and Omega[2]/Omega[4]
+    // we also have theoretically Omega_{++} Omega_{--} = - Omega_{-+} Omega{+-}
+    // i.e., Omegas[1] Omegas[4] = - Omegas[2] Omegas[3]
+    // in practice, we have this up to a unit,
+    // so we can avoid to the Omega with the lowest precision
+	_, i := Min([Precision(Universe(r)) : r in Omegas]);
 	if i eq 1 then
-		taus := [ [res_Cremona[2][i]/res_Cremona[4][i] : i in [1..dim]], [res_Cremona[3][i]/res_Cremona[4][i] : i in [1..dim]]];
+        nnd := [2, 3, 4]; // 1 = - 2*3/4
+	elif i eq 4 then
+        nnd := [2, 3, 1]; // 4 = - 2*3/1
 	elif i eq 2 then
-		taus := [ [res_Cremona[1][i]/res_Cremona[3][i] : i in [1..dim]], [res_Cremona[3][i]/res_Cremona[4][i] : i in [1..dim]]];
-	elif i eq 3 then
-		taus := [ [res_Cremona[2][i]/res_Cremona[4][i] : i in [1..dim]], [res_Cremona[1][i]/res_Cremona[2][i] : i in [1..dim]]];
-	else
-		taus := [ [res_Cremona[1][i]/res_Cremona[3][i] : i in [1..dim]], [res_Cremona[1][i]/res_Cremona[2][i] : i in [1..dim]]];
+        nnd := [1, 4, 3]; // 2 = -1*4/3
+	else // i == 3
+		nnd := [1, 4, 2]; // 2 = -1*4/3
 	end if;
-	return taus;
+    n1, n2, d := Explode(nnd);
+    // replace Omegas[i]
+    Omegas[i] := [-Omegas[n1][i]*Omegas[n2][i]/Omegas[d][i] : i in [1..dim]];
+	return [ [Omegas[3][i]/Omegas[1][i] : i in [1..dim]], [Omegas[2][i]/Omegas[4][i] : i in [1..dim]]];;
 end function;
 
-function FixTaus(F, taus)
+function FixModuliPoint(F, taus)
+    // use the units of F to assure that Taus are in the upper
 	U, phi := UnitGroup(F);
 	G := [g : g in Generators(U)];
 	taus_signs := [Sign(Imaginary(tau)) : tau in taus];
 	for c in CartesianPower({0,1}, #Generators(U)) do
 		u := F!&*[phi(g)^c[i] : i->g in G];
 		u_signs := [-Sign(Real(Evaluate(u, rho))) : rho in InfinitePlaces(F)];
-		taus_signs := [Sign(Imaginary(tau)) : tau in taus];
 		if taus_signs eq u_signs then
 			return [taus[i]*Evaluate(u, rho) : i->rho in InfinitePlaces(F)];
 		end if;
@@ -67,6 +72,68 @@ function FixTaus(F, taus)
 	assert(false);
 end function;
 
+intrinsic PossibleModuliPoints(H::FldNum, Omegas::List) -> SeqEnum
+ {given the candidates for Omega_i^s, use the Riemann--Hodge relation to compute possible taus}
+// We have that Omega_{++} Omega_{--} = - Omega_{+-} Omega_{-+}
+// so we take their quotient the cross product for all the embeddings
+// and try to figure out the factor that makes this equality hold up to units
+// as units will not affect the lattice
+  cross_prod := [  Omegas[1][i]*Omegas[4][i]/Omegas[2][i]/Omegas[3][i]  : i in [1..Degree(H)]];
+  _<x> := PolynomialRing(Universe(cross_prod));
+  cross_pol := &*[x-c : c in cross_prod];
+
+  // RationalReconstruction returns a boolean, and the approximation x
+// the boolean = AlmostEqual(x, input), ie, x is a good approximation
+coeffs_Q := [<a,b> where a,b := RationalReconstruction(ComplexFieldExtra(Precision(c)) ! c) : c in Coefficients(cross_pol)];
+// check that we got good approximation
+assert(not(false in {x[1] : x in coeffs_Q}));
+// Now construct the polynomial over Q
+RQ<xQ> := PolynomialRing(Rationals());
+cross_pol_Q := RQ![x[2] : x in coeffs_Q];
+// we check that is a power of an irreducible polynomial
+fact := Factorisation(cross_pol_Q);
+assert(#fact eq 1);
+// take its radical, i.e., the irreducible polynomial
+cross_pol_Q := fact[1][1];
+
+// pick the root that matches the complex embeddings of H
+roots := Roots(cross_pol_Q, H);
+differences := [Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..Degree(H)]]) : r in roots];
+ParallelSort(~differences, ~roots);
+assert differences[1]/differences[2] lt 10^(-Precision(Universe(differences))*0.5);
+cross_prod_H := roots[1,1];
+
+// we have (Omega_{++} Omega_{--})/(Omega_{+-} Omega_{-+}) = cross_prod_H
+// we desire this to be a unit
+// so we compute the possible divisors for the numerator and denominator of cross_prod_H
+cnum, cden := NumberFieldDivisors(cross_prod_H);
+
+// Find the taus
+return [ComputeModuliPoint(Omegas, pnum, pden) : pnum in cnum, pden in cden];
+end intrinsic;
+
+intrinsic ComputePossibleModuliPoints(cores::RngIntElt, label::MonStgElt, eigenvalues_dir::MonStgElt, B::RngIntElt : maxn:=false) -> SeqEnum
+{ Compute the possible moduli points à l'Oda }
+// this not also converts the eigenvalues if necessary
+f := LMFDBHMFwithEigenvalues(label, eigenvalues_dir);
+H := HeckeEigenvalueField(Parent(f));
+if maxn cmpeq false then
+    maxn := NormBoundOnComputedEigenvalues(f);
+end if;
+
+chis, chi_signs, values, skipped := ComputeOmegaValues(24, label, eigenvalues_dir, B : maxn:=maxn);
+
+// we have elt = [* chi_index , L(f, chi)(1), CFENew(L(f, chi))
+Omegas_per_sign := [* [* elt[2]  : elt in values_per_sign *] : values_per_sign in values *];
+
+Omegas := OmegasViaCremonaTrick(H, Omegas_per_sign);
+
+possible_zs := PossibleModuliPoints(H, Omegas);
+
+// force the Moduli points to be in he upper half plane by multiplying by a unit of F
+return [[ FixModuliPoint(H, z) : z in zs] : zs in possible_zs];
+end intrinsic;
+/*
 intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->.
 { Compute the period matrix à l'Oda }
 // Find the Omega values
@@ -110,3 +177,4 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 	PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in fixed_taus];
 		return <PeriodMatrices, <cnum, cden>, fixed_taus>;
 end intrinsic;
+*/

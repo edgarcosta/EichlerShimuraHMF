@@ -93,3 +93,9 @@ intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComE
   gcd := NumberFieldGCD(L);
   return [ Omegas[1][k] * Evaluate(gcd, InfinitePlaces(H)[k]) : k in [1..dim]], L;
 end intrinsic;
+
+intrinsic OmegasViaCremonaTrick(H::FldNum, Omegas_per_sign::List) -> List
+ { return candidates for Omega_i^s given Omega_(f_i, chi) grouped by sign(chi).
+ The candidates are deduced applying the Cremona trick to each group, to remove common algebraic factors defined over H }
+    return [* CremonaTrickWithEmbeddings(H, r) : r in Omegas_per_sign *];
+end intrinsic;
