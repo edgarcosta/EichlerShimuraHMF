@@ -58,13 +58,13 @@ function ComputeModuliPoint(Omegas, pnum, pden)
 end function;
 
 function FixModuliPoint(F, taus)
-    // use the units of F to assure that Taus are in the upper
+	// use the units of F to assure that Taus are in the upper
 	U, phi := UnitGroup(F);
 	G := [g : g in Generators(U)];
 	taus_signs := [Sign(Imaginary(tau)) : tau in taus];
 	for c in CartesianPower({0,1}, #Generators(U)) do
 		u := F!&*[phi(g)^c[i] : i->g in G];
-		u_signs := [-Sign(Real(Evaluate(u, rho))) : rho in InfinitePlaces(F)];
+		u_signs := [Sign(Real(Evaluate(u, rho))) : rho in InfinitePlaces(F)];
 		if taus_signs eq u_signs then
 			return [taus[i]*Evaluate(u, rho) : i->rho in InfinitePlaces(F)];
 		end if;
