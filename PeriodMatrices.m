@@ -71,7 +71,7 @@ intrinsic Polarization(A::RngOrdFracIdl, B::RngOrdFracIdl) -> AlgMatElt
   return E;
 end intrinsic;
 
-intrinsic ModuliToPeriodMatrix(z::FldComElt[], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
+intrinsic ModuliToPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
 { Returns the period matrix asociated to the lattice A*z + B*(1,...,1) }
   prec := Min([Precision(Parent(elt)) : elt in z]);
   CC := ComplexFieldExtra(prec);
@@ -84,7 +84,7 @@ intrinsic ModuliToPeriodMatrix(z::FldComElt[], A::RngOrdFracIdl, B::RngOrdFracId
   return HorizontalJoin([PA, PB]);
 end intrinsic;
 
-intrinsic ModuliToBigPeriodMatrix(z, A, B)
+intrinsic ModuliToBigPeriodMatrix(z, A, B) -> ModMatFldElt
 { Returns the period matrix asociated to the lattice A*z + B*(1,...,1), in basis, such that it is equipped with the standard symplectic pairing }
   P := ModuliToPeriodMatrix(z, A, B);
   E := Polarization(A, B);
@@ -95,7 +95,7 @@ intrinsic ModuliToBigPeriodMatrix(z, A, B)
   return bigP;
 end intrinsic;
 
-intrinsic ModuliToSmallPeriodMatrix(z, A, B)
+intrinsic ModuliToSmallPeriodMatrix(z, A, B) -> ModMatFldElt
 { Returns the small period matrix asociated to the lattice A*z + B*(1,...,1) }
   return SmallPeriodMatrix(ModuliToBigPeriodMatrix(z, A, B));
 end intrinsic;
