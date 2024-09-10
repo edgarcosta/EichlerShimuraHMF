@@ -36,7 +36,7 @@ intrinsic SchottkyModularForm(tau::AlgMatElt : theta:="Flint") -> Any
   M := [[m + n: n in SchottkyN] : m in [m1, m2, m3]];
 
 
-  pi1, pi2, pi3 := Explode([ &*[Theta(m, z, tau) : mi in Mi] : Mi in M ]);
+  pi1, pi2, pi3 := Explode([ &*[Theta(mi, z, tau) : mi in Mi] : Mi in M ]);
 
   return pi1^2 + pi2^2 + pi3^2 - 2*(pi1*pi2 + pi2*pi3 + pi1*pi3);
 end intrinsic;
