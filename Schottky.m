@@ -2,7 +2,7 @@ freeze;
 
 
 // baed on reconstructing-g4/magma/schottky.m
-intrinsic SchottkyModularForm(tau::AlgMatElt : theta:="Flint") -> Any
+intrinsic EvaluateSchottkyModularForm(tau::AlgMatElt : theta:="Flint") -> Any
   {FIXME}
 
   require (Nrows(tau) eq 4) and (Ncols(tau) eq 4): "period matrix must be 4 by 4";
