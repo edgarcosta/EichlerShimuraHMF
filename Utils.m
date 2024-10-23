@@ -23,7 +23,8 @@ end intrinsic;
 // FIXME: this doc string doesnt make much sense, but is the best I could come up with
 intrinsic HeckeCosetRepresentatives(ell::RngOrdIdl) -> SeqEnum
 { returns left/right coset decomposition of the Hecke operator corresponding ell }
-	K := NumberField(Order(ell));
+	O := Order(ell);
+	K := NumberField(O);
 	res := [MatrixAlgebra(K, 2) | ];
 	for divisor in Divisors(ell) do
 		b, d := IsNarrowlyPrincipal(divisor);
