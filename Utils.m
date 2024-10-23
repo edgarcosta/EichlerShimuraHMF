@@ -25,8 +25,8 @@ intrinsic HeckeCosetRepresentatives(ell::RngOrdIdl) -> SeqEnum
 { returns left/right coset decomposition of the Hecke operator corresponding ell }
 	K := NumberField(Order(ell));
 	res := [MatrixAlgebra(K, 2) | ];
-	for d in Divisors(ell) do
-		b, d := IsNarrowlyPrincipal(d);
+	for divisor in Divisors(ell) do
+		b, d := IsNarrowlyPrincipal(divisor);
 		if not b then continue; end if;
 		elloverd := ell/d;
 		b, e := IsNarrowlyPrincipal(elloverd);
