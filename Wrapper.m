@@ -1,5 +1,11 @@
 freeze;
 
+// TODO: can we just use:
+/*
+Divisors(x::RngOrdElt) -> SeqEnum
+
+All divisors (up to units) of x, which must lie in a maximal order.
+*/
 function NumberFieldDivisors(x)
 	H := Parent(x);
 	if H eq Rationals() then
