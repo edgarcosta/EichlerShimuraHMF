@@ -210,11 +210,11 @@ function NormalizedPolynomialWithZeroes(L)
 end function;
 
 // wrapper
-intrinsic InvariantsPolynomial(tau::AlgMatElt : flint := true, extra_endos := true) -> Any
+intrinsic InvariantsPolynomial(tau::AlgMatElt : flint:=true, extra_endos:=true) -> Any
     {Given a small period matrix tau, compute the invariants polynomial.}
     CC<I> := BaseRing(Parent(tau));
   //print Sprintf("%m", E);
-    E4s := E4Ratios(tau : flint := flint, extra_endos := extra_endos);
+    E4s := E4Ratios(tau : flint:=flint, extra_endos := extra_endos);
   return NormalisedPolynomialWithZeros(E4s);
 end intrinsic;
 
@@ -236,8 +236,9 @@ intrinsic InvariantsPolynomial_old(tau::AlgMatElt) -> Any
   return NormalisedPolynomialWithZeros(deltaVs);
 end intrinsic;
 
-intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, Es::Any) -> Any
-  { Given a pair of polynomial's corresponding the two embeddings of a quadratic number field F, reconstruct the original polynomial }
+//FIXME keep this one or ReconstructConjugatePolynomialsPair
+intrinsic RecogniseConjugatePolynomials(F::FldNum, Es::Any) -> Any
+  {}
   assert #Es eq 2;
   assert Degree(F) eq 2;
   CCz<z> := PolynomialRing(Universe(Es[1]));
