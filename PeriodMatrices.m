@@ -97,5 +97,5 @@ end intrinsic;
 
 intrinsic SmallPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
 { Returns the small period matrix asociated to the lattice A*z + B*(1,...,1) }
-  return SmallPeriodMatrix(BigPeriodMatrix(z, A, B));
+  return SmallPeriodMatrix(B)
 end intrinsic;

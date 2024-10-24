@@ -21,35 +21,19 @@ function ThetaSections(tau : Reduce:=true)
         where zero := Matrix(2*g,1,[CC | 0 : i in [1..2*g]]);
 end function;
 
-// this uses Magma's implementation of theta functions
-function ThetaFunctions(tau)
-    g := Nrows(tau);
-    CC<I> := BaseRing(Parent(tau));
-    return [map< KMatrixSpace(CC,g,1)->CC |
-        z :-> Theta(m, z, tau)>
-        where m := Matrix(2*g,1, [c[i] : i in [1..2*g]])
-        : c in CartesianPower({CC|0,1/2},2*g) ];
+function ThetaFunctions(tau : theta:="Flint")
+  if theta eq "Flint" then
+    Theta := ThetaFlint;
+  end if;
+  g := Nrows(tau);
+  CC<I> := BaseRing(Parent(tau));
+  return [map< KMatrixSpace(CC,g,1)->CC |
+    z :-> Theta(m, z, tau)>
+    where m := Matrix(2*g,1, [c[i] : i in [1..2*g]])
+    : c in CartesianPower({CC|0,1/2},2*g) ];
 end function;
 
-/*
-// this uses Jean's implementation of theta functions in Flint via FlintWrapper.m
-function ThetaFunctionsFlint(tau)
-    g := Nrows(tau);
-    CC<I> := BaseRing(Parent(tau));
-    return map< KMatrixSpace(CC,g,1)-> KMatrixSpace(CC,2^(2*g),1) |
-        z :-> ThetaFlint(Matrix([[0]]), z, tau)>;
-end function;
-*/
 
-// this uses Magma's implementation of theta functions
-function ThetaFunctions(tau)
-    g := Nrows(tau);
-    CC<I> := BaseRing(Parent(tau));
-    return [map< KMatrixSpace(CC,g,1)->CC |
-        z :-> ThetaFlint(m, z, tau)>
-        where m := Matrix(2*g,1, [c[i] : i in [1..2*g]])
-        : c in CartesianPower({CC|0,1/2},2*g) ];
-end function;
 
 /*
     Given a generator E for complex geometric endomorphism representation of extended_tau (computed via GeometricEndomorphismRepresentationCC(extended_tau)[2][2]), return the set of 1-dimensional k-subspaces of A[2], where A is the abelian variety corresponding to tau, and k = GF(2^g)
@@ -175,27 +159,11 @@ function EighthPowersSum(tau, v : eps := 1E-6, n := 1, m := false, flint := true
     M := KiefferMatrix(v);
 	isogenous_tau := act_gamma(tau, M);
 	assert IsSmallPeriodMatrix(isogenous_tau);
-    if flint then
-        theta := ThetaFunctionsFlint(isogenous_tau);
-    else
-        theta := ThetaFunctions(isogenous_tau);
-    end if;
+    theta := ThetaFunctions(isogenous_tau : theta:=flint cmpeq true select "Flint" else "");
     if m cmpeq false then
         m := 4*Round(Log(2, Determinant(Submatrix(M, 1, 1, g, g)))) - g;
-		if flint then
-			return 2^m * &+[ t[i][1]^(8*n) : i in [1..Rank(Parent(t))] ] where t := theta(0);
-		end if;
         return 2^m *  &+[ t(0)^(8*n) : t in theta ];
     end if;
-    
-	assert(false);
-	if Max([Abs(x) : x in Eltseq(isogenous_tau - 2*tau)]) lt eps then
-		print "Found 2*tau";
-		return 2^(m-g) *  &+[ t(0)^(8*n) : t in theta ]; // or 2^(3*g)?
-	else
-        print "not Found 2*tau";
-	    return 2^(-g) * &+[ t(0)^(8*n) : t in theta ];
-	end if;
 end function;
 
 intrinsic E4Ratios(tau::AlgMatElt : extra_endos := true, m := false, flint := true) -> Any
