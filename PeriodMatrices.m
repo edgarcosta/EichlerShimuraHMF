@@ -92,7 +92,7 @@ intrinsic BigPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFrac
   S, F := FrobeniusFormAlternating(E);
   assert S eq StandardSymplecticMatrix(g);
   bigP := P*Transpose(ChangeRing(F, BaseRing(P)));
-  return bigP;
+  return bigP, F;
 end intrinsic;
 
 intrinsic SmallPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
