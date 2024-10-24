@@ -236,8 +236,8 @@ intrinsic InvariantsPolynomial_old(tau::AlgMatElt) -> Any
   return NormalisedPolynomialWithZeros(deltaVs);
 end intrinsic;
 
-intrinsic RecogniseConjugatePolynomials(F::FldNum, Es::Any) -> Any
-  {}
+intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, Es::Any) -> Any
+  { Given a pair of polynomial's corresponding the two embeddings of a quadratic number field F, reconstruct the original polynomial }
   assert #Es eq 2;
   assert Degree(F) eq 2;
   CCz<z> := PolynomialRing(Universe(Es[1]));
