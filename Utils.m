@@ -1,6 +1,6 @@
 freeze;
 
-intrinsic PositeElementsUpTo(B::RngIntElt, O::RngOrd : CoprimeTo:=[]) -> SeqEnum
+intrinsic PositiveElementsUpTo(B::RngIntElt, O::RngOrd : CoprimeTo:=[]) -> SeqEnum
 {Returns a sequence containing the positive elements of the maximal order O or the maximal order of K with norm at most B which are coprime to any ideals given in CoprimeTo.}
   L := IdealsUpTo(B, O);
   E := [ O | ];
@@ -14,9 +14,9 @@ intrinsic PositeElementsUpTo(B::RngIntElt, O::RngOrd : CoprimeTo:=[]) -> SeqEnum
 end intrinsic;
 
 
-intrinsic PositeElementsUpTo(B::RngIntElt, K::FldNum : CoprimeTo:=[]) -> SeqEnum
+intrinsic PositiveElementsUpTo(B::RngIntElt, K::FldNum : CoprimeTo:=[]) -> SeqEnum
 { " }//"
-  return [K | x : x in PositeElementsUpTo(B, Integers(K) : CoprimeTo:=CoprimeTo)];
+  return [K | x : x in PositiveElementsUpTo(B, Integers(K) : CoprimeTo:=CoprimeTo)];
 end intrinsic;
 
 
