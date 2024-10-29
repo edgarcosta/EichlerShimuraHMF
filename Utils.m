@@ -33,17 +33,17 @@ intrinsic HeckeCosetRepresentatives(ell::RngOrdIdl) -> SeqEnum
     b, e := IsNarrowlyPrincipal(elloverd);
     if not b then continue; end if;
     Q, phi := quo< O | elloverd>;
-        res cat:= [Matrix([ [K | d, r @@ phi], [0, e] ]) : r in Q];
+    res cat:= [Matrix([ [K | d, r @@ phi], [0, e] ]) : r in Q];
   end for;
   return res;
 end intrinsic;
 
 function ApplyIsogeny(zs, isog)
-    H := BaseRing(isog);
-    a, b, c, d := Explode(Eltseq(isog));
-    assert c eq 0;
-    pl := InfinitePlaces(H);
-    return [(Evaluate(a, pl[i])*z + Evaluate(b, pl[i]))/Evaluate(d, pl[i]) : i->z in zs];
+  H := BaseRing(isog);
+  a, b, c, d := Explode(Eltseq(isog));
+  assert c eq 0;
+  pl := InfinitePlaces(H);
+  return [(Evaluate(a, pl[i])*z + Evaluate(b, pl[i]))/Evaluate(d, pl[i]) : i->z in zs];
 end function;
 
 intrinsic IsogenousModuli(zs::SeqEnum[FldComElt], ell::RngOrdIdl) -> SeqEnum[SeqEnum[FldComElt]]
@@ -53,12 +53,12 @@ end intrinsic;
 
 intrinsic TwoIsogenous(zs::SeqEnum[FldComElt], H::FldNum) -> SeqEnum[SeqEnum[FldComElt]]
 {}
-    prec := Precision(Universe(zs));
-    OH := Integers(H);
-    Q, phi := quo<OH | 2*OH>;
-    reps := [r @@ phi : r in Q];
-    pl := InfinitePlaces(H);
-    return [[(z + Evaluate(r, pl[i] : Precision:=prec))/2 : i->z in zs] : r in reps] cat [[2*z : z in zs]];
+  prec := Precision(Universe(zs));
+  OH := Integers(H);
+  Q, phi := quo<OH | 2*OH>;
+  reps := [r @@ phi : r in Q];
+  pl := InfinitePlaces(H);
+  return [[(z + Evaluate(r, pl[i] : Precision:=prec))/2 : i->z in zs] : r in reps] cat [[2*z : z in zs]];
 end intrinsic;
 
 

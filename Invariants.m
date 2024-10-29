@@ -40,11 +40,11 @@ end function;
 */
 
 function OneDimensionalTwoTorsionSubspaces(E : IncludeTrivial := false)
-	// This function computes the 1-dimensional k-subspaces of A[2]. Here k is the residue field of the endomorphism ring at 2 (i.e. F_{2^g}).
-	// The input E gives the action of the generator of the endomorphism ring on A.
+  // This function computes the 1-dimensional k-subspaces of A[2]. Here k is the residue field of the endomorphism ring at 2 (i.e. F_{2^g}).
+  // The input E gives the action of the generator of the endomorphism ring on A.
     g := Nrows(E) div 2;
     E2 := ChangeRing(E, GF(2));
-	assert Order(E2) eq 2^g - 1;
+  assert Order(E2) eq 2^g - 1;
     U := VectorSpace(GF(2), 2*g);
     X := Set(U);
     G := Sym(X)![x*Transpose(E2) : x in X]; // This is E acting on A[2] (as a set).
@@ -60,45 +60,45 @@ end function;
 
 
 function KiefferMatrix(W)
-	// Given an isotropic subspace of the symplectic space F2^g, find a block matrix satisying c = 0, ad^t = l^n*id, ab^t is symmetric, representing the subspace.
-	U := Generic(W);
-	p := Characteristic(BaseField(U));
-	g := Dimension(U) div 2;
-	if Dimension(W) eq Dimension(U) then
-		return IdentityMatrix(Integers(), 2*g);
-	end if;
-	TWprev := sub<U | 0>;
-	R := [];
-	for i in [2*g..g+1 by -1] do
-		T := sub<U | [U.j : j in [i..2*g]]>;
-		TW := T meet W;
-		if TW eq TWprev then
-			Append(~R, [i eq j select p else 0 : j in [1..2*g]]);
-		else
-			v := [TW.i : i in [1..Dimension(TW)] | not(TW.i) in TWprev][1];
-			Append(~R, [Integers()!v[j] : j in [1..2*g]]);
-		end if;	
-		TWprev := TW;
-	end for;
-	valW := Dimension(W);
-	BottomMatrix := Matrix([r[[2*g..g+1 by -1]] : r in R]);
-	TopMatrix := p^(1)*Transpose(ChangeRing(BottomMatrix, Rationals())^(-1));
-	M := Matrix([ [i eq j select 1 else 0 : j in [1..g] ] : i in [1..2*g] ]);
-	for i in [g..1 by -1] do
-		newRow := [Integers() | TopMatrix[g+1-i][j] : j in [g..1 by -1]];
-		T := sub<U | [U.j : j in [i..2*g]]>;
-		TW := T meet W;
-		if newRow[i] eq 2 then
-			newRow cat:= [0 : j in [1..g]];
-		else
-			v := Solution((Matrix([[v[j] : j in [1..g]] : v in Basis(W)])), ChangeRing(Vector(newRow), GF(2)));
-			w := &+[ v[i]*b : i->b in Basis(W)];
-			newRow cat:= [Integers()!w[g+j] : j in [1..g]];
-		end if;
-		Append(~R, newRow);
-		TWprev := TW;
-	end for;
-	return Matrix(Reverse(R));
+  // Given an isotropic subspace of the symplectic space F2^g, find a block matrix satisying c = 0, ad^t = l^n*id, ab^t is symmetric, representing the subspace.
+  U := Generic(W);
+  p := Characteristic(BaseField(U));
+  g := Dimension(U) div 2;
+  if Dimension(W) eq Dimension(U) then
+    return IdentityMatrix(Integers(), 2*g);
+  end if;
+  TWprev := sub<U | 0>;
+  R := [];
+  for i in [2*g..g+1 by -1] do
+    T := sub<U | [U.j : j in [i..2*g]]>;
+    TW := T meet W;
+    if TW eq TWprev then
+      Append(~R, [i eq j select p else 0 : j in [1..2*g]]);
+    else
+      v := [TW.i : i in [1..Dimension(TW)] | not(TW.i) in TWprev][1];
+      Append(~R, [Integers()!v[j] : j in [1..2*g]]);
+    end if;  
+    TWprev := TW;
+  end for;
+  valW := Dimension(W);
+  BottomMatrix := Matrix([r[[2*g..g+1 by -1]] : r in R]);
+  TopMatrix := p^(1)*Transpose(ChangeRing(BottomMatrix, Rationals())^(-1));
+  M := Matrix([ [i eq j select 1 else 0 : j in [1..g] ] : i in [1..2*g] ]);
+  for i in [g..1 by -1] do
+    newRow := [Integers() | TopMatrix[g+1-i][j] : j in [g..1 by -1]];
+    T := sub<U | [U.j : j in [i..2*g]]>;
+    TW := T meet W;
+    if newRow[i] eq 2 then
+      newRow cat:= [0 : j in [1..g]];
+    else
+      v := Solution((Matrix([[v[j] : j in [1..g]] : v in Basis(W)])), ChangeRing(Vector(newRow), GF(2)));
+      w := &+[ v[i]*b : i->b in Basis(W)];
+      newRow cat:= [Integers()!w[g+j] : j in [1..g]];
+    end if;
+    Append(~R, newRow);
+    TWprev := TW;
+  end for;
+  return Matrix(Reverse(R));
 end function;
 
 
@@ -120,17 +120,17 @@ end function;
 
 /*
 function TwoIsogenousAVs(tau, Vs)
-	O := [];
+  O := [];
     g := Nrows(tau);
     CC<I> := BaseRing(Parent(tau));
     U := Generic(Vs[1]);
     assert #Vs eq 2^g + 1;
-	extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
-	for v in Vs do
-		M := KiefferMatrix(v);
-		isogenous_tau := SmallPeriodMatrix(extended_tau*ChangeRing(M,CC));
-		Append(~O, isogenous_tau);
-	end for;
+  extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
+  for v in Vs do
+    M := KiefferMatrix(v);
+    isogenous_tau := SmallPeriodMatrix(extended_tau*ChangeRing(M,CC));
+    Append(~O, isogenous_tau);
+  end for;
     return O;
 end function;
 */
@@ -157,44 +157,44 @@ function EighthPowersSum(tau, v : eps := 1E-6, n := 1, m := false, flint := true
 
     CC<I> := BaseRing(Parent(tau));
     M := KiefferMatrix(v);
-	isogenous_tau := act_gamma(tau, M);
-	assert IsSmallPeriodMatrix(isogenous_tau);
-    theta := ThetaFunctions(isogenous_tau : theta:=flint cmpeq true select "Flint" else "");
-    if m cmpeq false then
-        m := 4*Round(Log(2, Determinant(Submatrix(M, 1, 1, g, g)))) - g;
-        return 2^m *  &+[ t(0)^(8*n) : t in theta ];
-    end if;
+  isogenous_tau := act_gamma(tau, M);
+  assert IsSmallPeriodMatrix(isogenous_tau);
+  theta := ThetaFunctions(isogenous_tau : theta:=flint cmpeq true select "Flint" else "");
+  if m cmpeq false then
+      m := 4*Round(Log(2, Determinant(Submatrix(M, 1, 1, g, g)))) - g;
+  end if;
+  return 2^m *  &+[ t(0)^(8*n) : t in theta ];
 end function;
 
 intrinsic E4Ratios(tau::AlgMatElt : extra_endos := true, m := false, flint := true) -> Any
     {}
-	CC<I> := BaseRing(Parent(tau));
-	if extra_endos cmpeq true then
-		g := Nrows(tau);
-		extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
-		E := GeometricEndomorphismRepresentationCC(extended_tau);
-		assert #E eq 2;
-		assert IsIdentity(E[1][2]);
-	else
-		E := [ extra_endos, extra_endos ];
-	end if;
-	Vs := OneDimensionalTwoTorsionSubspaces(E[2][2] : IncludeTrivial);
-	E4s := [EighthPowersSum(tau, v : m := m, flint := flint) : v in Vs];
-	E4rs := [x/y : x in E4s[1..#E4s-1]] where y := E4s[#E4s]; // last one is E_4(tau)
+  CC<I> := BaseRing(Parent(tau));
+  if extra_endos cmpeq true then
+    g := Nrows(tau);
+    extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
+    E := GeometricEndomorphismRepresentationCC(extended_tau);
+    assert #E eq 2;
+    assert IsIdentity(E[1][2]);
+  else
+    E := [ extra_endos, extra_endos ];
+  end if;
+  Vs := OneDimensionalTwoTorsionSubspaces(E[2][2] : IncludeTrivial);
+  E4s := [EighthPowersSum(tau, v : m := m, flint := flint) : v in Vs];
+  E4rs := [x/y : x in E4s[1..#E4s-1]] where y := E4s[#E4s]; // last one is E_4(tau)
     //print E4s;
-	return E4rs, E4s;
+  return E4rs, E4s;
 end intrinsic;
 
 
 /*
-	Given a point in projective space, determine a polynomial whose zeros are exactly the coordinates of this point, normalised in such a way that the highest degree coefficients are all zero.
+  Given a point in projective space, determine a polynomial whose zeros are exactly the coordinates of this point, normalised in such a way that the highest degree coefficients are all zero.
 */
 function NormalisedPolynomialWithZeros(L)
-	CCz<z> := PolynomialRing(Universe(L));
-	PV0 := &*[z - elt : elt in L];
-	//c := Coefficient(PV0, Degree(PV0)-1);
-	return PV0, 1;
-	//return Reverse(Evaluate(Reverse(PV0), z/c)), c; We used to rescale the polynomial, but it turned out that this was not necessary and actually made it harder.
+  CCz<z> := PolynomialRing(Universe(L));
+  PV0 := &*[z - elt : elt in L];
+  //c := Coefficient(PV0, Degree(PV0)-1);
+  return PV0, 1;
+  //return Reverse(Evaluate(Reverse(PV0), z/c)), c; We used to rescale the polynomial, but it turned out that this was not necessary and actually made it harder.
 end function;
 
 function NormalizedPolynomialWithZeros(L)
@@ -210,82 +210,83 @@ function NormalizedPolynomialWithZeroes(L)
 end function;
 
 // wrapper
-intrinsic InvariantsPolynomial(tau::AlgMatElt : flint := true, extra_endos := true) -> Any
+intrinsic InvariantsPolynomial(tau::AlgMatElt : flint:=true, extra_endos:=true) -> Any
     {Given a small period matrix tau, compute the invariants polynomial.}
     CC<I> := BaseRing(Parent(tau));
-	//print Sprintf("%m", E);
-    E4s := E4Ratios(tau : flint := flint, extra_endos := extra_endos);
-	return NormalisedPolynomialWithZeros(E4s);
+  //print Sprintf("%m", E);
+    E4s := E4Ratios(tau : flint:=flint, extra_endos := extra_endos);
+  return NormalisedPolynomialWithZeros(E4s);
 end intrinsic;
 
 intrinsic InvariantsPolynomial_old(tau::AlgMatElt) -> Any
     {Given a small period matrix tau, compute the invariants polynomial.}
     CC<I> := BaseRing(Parent(tau));
-	g := Nrows(tau);
-	extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
-	E := GeometricEndomorphismRepresentationCC(extended_tau);
-	if g eq 1 then
-		Append(~E, E[1]);
-	else
-		assert #E eq 2;
-	end if;
-	assert IsIdentity(E[1][2]);
-	//print Sprintf("%m", E);
-	Vs := OneDimensionalTwoTorsionSubspaces(E[2][2]);
-	deltaVs := CosetDeterminantProducts(tau, Vs);
-	return NormalisedPolynomialWithZeros(deltaVs);
+  g := Nrows(tau);
+  extended_tau := HorizontalJoin(tau, IdentityMatrix(CC, g));
+  E := GeometricEndomorphismRepresentationCC(extended_tau);
+  if g eq 1 then
+    Append(~E, E[1]);
+  else
+    assert #E eq 2;
+  end if;
+  assert IsIdentity(E[1][2]);
+  //print Sprintf("%m", E);
+  Vs := OneDimensionalTwoTorsionSubspaces(E[2][2]);
+  deltaVs := CosetDeterminantProducts(tau, Vs);
+  return NormalisedPolynomialWithZeros(deltaVs);
 end intrinsic;
 
+//FIXME keep this one or ReconstructConjugatePolynomialsPair
 intrinsic RecogniseConjugatePolynomials(F::FldNum, Es::Any) -> Any
-	{}
-	assert #Es eq 2;
-	assert Degree(F) eq 2;
-	CCz<z> := PolynomialRing(Universe(Es[1]));
-	_<x> := PolynomialRing(F);
-	fs := [&*[z - elt : elt in L] : L in Es];
-	vsCC := [Reverse(Coefficients(f)) : f in fs];
-	weights := [0..Degree(fs[1])];
-	vs := [];
-	maxe := 0;
-	CC := Universe(vsCC[1]);
-	for i->w in weights do
-		aCC := vsCC[1,i];
-		bCC := vsCC[2,i];
-		_, t := RationalReconstruction(aCC + bCC);
-		_, n := RationalReconstruction(aCC * bCC);
-		minpoly := x^2 - t*x + n;
-		roots := Roots(minpoly, F);
-		_, j := Min([Abs(EmbedExtra(r[1]) - aCC) : r in roots]);
-		a := roots[j,1];
-		_, e := AlmostEqual(aCC, a);
-		maxe := Max(e, maxe);
-		if e^2 gt CC`epscomp then
-			return false, vs, maxe;
-		end if;
-		Append(~vs, a);
-		f, p := PowerFreePart(Rationals()!Denominator(a), w);
-		s := &*PrimeDivisors(Integers()!f);
-		vsCC[1] := WPSMultiply(weights, vsCC[1], s * p);
-		vsCC[2] := WPSMultiply(weights, vsCC[2], s * p);
-		vs := WPSMultiply(weights[1..i], vs, s * p);
-	end for;
-	return true, vs, maxe;
+  {}
+  assert #Es eq 2;
+  assert Degree(F) eq 2;
+  CCz<z> := PolynomialRing(Universe(Es[1]));
+  _<x> := PolynomialRing(F);
+  fs := [&*[z - elt : elt in L] : L in Es];
+  vsCC := [Reverse(Coefficients(f)) : f in fs];
+  weights := [0..Degree(fs[1])];
+  vs := [];
+  maxe := 0;
+  CC := Universe(vsCC[1]);
+  for i->w in weights do
+    aCC := vsCC[1,i];
+    bCC := vsCC[2,i];
+    _, t := RationalReconstruction(aCC + bCC);
+    _, n := RationalReconstruction(aCC * bCC);
+    minpoly := x^2 - t*x + n;
+    roots := Roots(minpoly, F);
+    _, j := Min([Abs(EmbedExtra(r[1]) - aCC) : r in roots]);
+    a := roots[j,1];
+    _, e := AlmostEqual(aCC, a);
+    maxe := Max(e, maxe);
+    if e^2 gt CC`epscomp then
+      return false, vs, maxe;
+    end if;
+    Append(~vs, a);
+    f, p := PowerFreePart(Rationals()!Denominator(a), w);
+    s := &*PrimeDivisors(Integers()!f);
+    vsCC[1] := WPSMultiply(weights, vsCC[1], s * p);
+    vsCC[2] := WPSMultiply(weights, vsCC[2], s * p);
+    vs := WPSMultiply(weights[1..i], vs, s * p);
+  end for;
+  return true, vs, maxe;
 end intrinsic;
 
 intrinsic RecognisePolynomial(f::RngUPolElt) -> RngUPolElt
     {}
-	R<x> := PolynomialRing(Rationals());
-	return R![ cQQ where _, cQQ := RationalReconstruction(c) : c in Coefficients(f)];
+  R<x> := PolynomialRing(Rationals());
+  return R![ cQQ where _, cQQ := RationalReconstruction(c) : c in Coefficients(f)];
 end intrinsic;
 
 intrinsic RecognizePolynomial(f::RngUPolElt) -> RngUPolElt
-	{}
-	return RecognisePolynomial(f);
+  {}
+  return RecognisePolynomial(f);
 end intrinsic;
 
 intrinsic FindGaloisGroup(vs::Any) -> Any
-	{}
-	pol := Polredbest(ChangeRing(Polynomial(vs) * Polynomial([Trace(elt) - elt : elt in vs]), Rationals()));
-	G2 := GaloisGroup(Factorization(pol));
-	return G2;
+  {}
+  pol := Polredbest(ChangeRing(Polynomial(vs) * Polynomial([Trace(elt) - elt : elt in vs]), Rationals()));
+  G2 := GaloisGroup(Factorization(pol));
+  return G2;
 end intrinsic;
