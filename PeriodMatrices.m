@@ -74,7 +74,7 @@ intrinsic MobiusModuliToSiegel(M::AlgMatElt, A::RngOrdFracIdl, B::RngOrdFracIdl 
     [MultiplicationMatrix(c, A, B), MultiplicationMatrix(d, B, B)]
   ]);
   if ToStandard cmpeq false then
-    F := PolarizationToStandard(A, B);
+    ToStandard := PolarizationToStandard(A, B);
   end if;
-  return F*M*F^-1;
+  return F*M*F^-1 where F:=ToStandard;
 end intrinsic;
