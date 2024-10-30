@@ -21,7 +21,7 @@ end intrinsic;
 
 
 // FIXME: this doc string doesnt make much sense, but is the best I could come up with
-intrinsic HeckeCosetRepresentatives(ell::RngOrdIdl) -> SeqEnum
+intrinsic HeckeCosetRepresentatives(ell::RngOrdIdl) -> SeqEnum[AlgMatElt]
 { returns left/right coset decomposition of the Hecke operator T_ell }
   O := Order(ell);
   K := NumberField(O);

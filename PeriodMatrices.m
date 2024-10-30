@@ -1,60 +1,6 @@
 freeze;
 
 
-
-/*
-Old functions that resulted in pairing in the inverse different or something instead of ZZ
-
-// Given a totally real field H of degree g and a g-tuple of points in the upper half-plane, return the corresponding big period matrix
-intrinsic ModuliToBigPeriodMatrix(H, points) -> AlgMatElt
-{ Given a list of taus and a totally real field, compute a big period matrix. }
-    prec := Min([Precision(Parent(elt)) : elt in points]);
-    CC := ComplexFieldExtra(prec);
-    // should they be purely imaginary?
-    //assert &and[Abs(Re(p)) lt CC`epscomp : p in points];
-    OF := Integers(H);
-    g := Degree(H);
-    betas := [[CC | Evaluate(OF.i, pl : Precision := prec+10) : pl in InfinitePlaces(H)] : i in [1..g]];
-    Pi1 := Transpose(Matrix(CC, betas));
-    Pi2 := Transpose(Matrix(CC, [[bij*points[j] : j->bij in bi] : bi in betas]));
-    bigres := HorizontalJoin(Pi2, Pi1);
-    return bigres;
-end intrinsic;
-
-// Given a totally real field F and a g-tuple of points in the upper half-plane, return the corresponding small period matrix
-intrinsic ModuliToSmallPeriodMatrix(F, points) -> AlgMatElt
-{ Given a list of taus and a totally real field, compute a small period matrix. }
-    return SmallPeriodMatrix(ModuliToBigPeriodMatrix(F, points));
-end intrinsic;
-*/
-
-
-/* We decided to go for the Goren standard
-// Given a totally real field H of degree g and a g-tuple of points in the upper half-plane, return the corresponding big period matrix
-intrinsic ModuliToBigPeriodMatrixNoam(H, points : fix_signs := false) -> AlgMatElt
-{ Modified version of the ModiliToBigPeriodMatrix. }
-    prec := Min([Precision(Parent(elt)) : elt in points]);
-    CC := ComplexFieldExtra(prec);
-    // should they be purely imaginary?
-    //assert &and[Abs(Re(p)) lt CC`epscomp : p in points];
-    OH := Integers(H);
-	B := Basis(OH);
-    g := Degree(H);
-    betas := [[CC | Evaluate(B[i], pl : Precision := prec+10) : pl in InfinitePlaces(H)] : i in [1..g]];
-    Pi1 := Transpose(Matrix(CC, betas));
-    Pi2 := DiagonalMatrix(points)*(Transpose(Pi1)^-1);
-    //bigres := HorizontalJoin(Pi2, Pi1);
-    //return Pi1, Pi2;
-    return HorizontalJoin(Pi2, Pi1);
-end intrinsic;
-
-intrinsic ModuliToSmallPeriodMatrixNoam(F, points) -> AlgMatElt
-{ Given a list of taus and a totally real field, compute a small period matrix. }
-    return SmallPeriodMatrix(ModuliToBigPeriodMatrixNoam(F, points));
-end intrinsic;
-*/
-
-
 intrinsic Polarization(A::RngOrdFracIdl, B::RngOrdFracIdl) -> AlgMatElt
 { given two fractional ideals, returns the matrix representing the pairing E_r on A+B defined as
   E_r((x1, y1), (x2, y2)) = Trace(r*(x1*y2 - x2*y1)) }
@@ -70,6 +16,17 @@ intrinsic Polarization(A::RngOrdFracIdl, B::RngOrdFracIdl) -> AlgMatElt
   E := BlockMatrix([[0, P], [-Transpose(P), 0]]);
   return E;
 end intrinsic;
+
+
+function PolarizationToStandard(A, B)
+  // FIXME: cache?
+  E := Polarization(A, B);
+  g := Nrows(E) div 2;
+  S, F := FrobeniusFormAlternating(E);
+  assert S eq StandardSymplecticMatrix(g);
+  return F;
+end function;
+
 
 intrinsic PeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
 { Returns the period matrix asociated to the lattice A*z + B*(1,...,1) }
@@ -87,10 +44,7 @@ end intrinsic;
 intrinsic BigPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFracIdl) -> ModMatFldElt
 { Returns the period matrix asociated to the lattice A*z + B*(1,...,1), in basis, such that it is equipped with the standard symplectic pairing }
   P := PeriodMatrix(z, A, B);
-  E := Polarization(A, B);
-  g := Nrows(E) div 2;
-  S, F := FrobeniusFormAlternating(E);
-  assert S eq StandardSymplecticMatrix(g);
+  F := PolarizationToStandard(A, B);
   bigP := P*Transpose(ChangeRing(F, BaseRing(P)));
   return bigP, F;
 end intrinsic;
@@ -99,4 +53,28 @@ intrinsic SmallPeriodMatrix(z::SeqEnum[FldComElt], A::RngOrdFracIdl, B::RngOrdFr
 { Returns the small period matrix asociated to the lattice A*z + B*(1,...,1) }
   B, F := BigPeriodMatrix(z, A, B);
   return SmallPeriodMatrix(B), F;
+end intrinsic;
+
+
+function Coordinates(r, O)
+    return Eltseq(O!r);
+end function;
+
+function MultiplicationMatrix(r, A, B)
+    O := Order(A);
+    assert Order(A) eq Order(B);
+    return Matrix(Rationals(), Solution(Matrix([Coordinates(b, O) : b in Basis(A)]), Matrix([Coordinates(r*b, O) : b in Basis(B)])));
+end function;
+
+intrinsic MobiusModuliToSiegel(M::AlgMatElt, A::RngOrdFracIdl, B::RngOrdFracIdl : ToStandard:=false) -> AlgMatElt
+{ Given a Mobius transformation on h^g gives the corresponding matrix for in Siegel upper half-space}
+  a, b, c, d := Explode(Eltseq(M));
+  M :=  BlockMatrix([
+    [MultiplicationMatrix(a, A, A), MultiplicationMatrix(b, B, A)],
+    [MultiplicationMatrix(c, A, B), MultiplicationMatrix(d, B, B)]
+  ]);
+  if ToStandard cmpeq false then
+    F := PolarizationToStandard(A, B);
+  end if;
+  return F*M*F^-1;
 end intrinsic;

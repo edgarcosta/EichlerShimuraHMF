@@ -2,12 +2,12 @@
   CremonaTrick.m
   Eigenvalues.m
   HeckeCharacters.m
-  Invariants.m
   Labels.m
   OmegaValues.m
   PeriodMatrices.m
   Schottky.m
   TwistedLfunction.m
+  TwoTorsion.m
   Utils.m
   Wrapper.m
 }
