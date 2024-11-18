@@ -1,12 +1,12 @@
 AttachSpec("spec");
 
 ComputeLvalues := false;
+cores := 24;
 
 if ComputeLvalues then
   eigenvalues_dir := "../EichlerShimuraHMF-eigenvalues/";
   label := "2.2.12.1-578.1-c";
   B := 25;
-  cores := 24;
   f := LMFDBHMFwithEigenvalues(label, eigenvalues_dir);
   maxn := NormBoundOnComputedEigenvalues(f);
   time possible_zs := ComputePossibleModuliPoints(cores, label, eigenvalues_dir, B : maxn:=400000);
