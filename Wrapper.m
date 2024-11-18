@@ -41,8 +41,10 @@ function ComputeModuliPoint(Omegas, pnum, pden)
       Omegas[j][i] *:= Evaluate(mod_factors[j], InfinitePlaces(H)[i]);
     end for;
   end for;
+  // Omegas are aligned with the list of signs [ [1,1], [1,-1], [-1,1], [-1,-1] ];
+  // Omegas := [Omega_{++}, Omega_{+-}, Omega_{-+}, Omega_{--}]
   // we now compute Omega_{-+}/Omega_{++}, Omega_{+-}/Omega_{++}
-  // i.e. Omegas[3]/Omegas[1] and Omega[2]/Omega[4]
+  // i.e. Omegas[3]/Omegas[1] and Omegas[2]/Omegas[1]
   // we also have theoretically Omega_{++} Omega_{--} = - Omega_{-+} Omega{+-}
   // i.e., Omegas[1] Omegas[4] = - Omegas[2] Omegas[3]
   // in practice, we have this up to a unit,
@@ -60,7 +62,7 @@ function ComputeModuliPoint(Omegas, pnum, pden)
     n1, n2, d := Explode(nnd);
     // replace Omegas[i]
     Omegas[i] := [-Omegas[n1][i]*Omegas[n2][i]/Omegas[d][i] : i in [1..dim]];
-  return [ [Omegas[3][i]/Omegas[1][i] : i in [1..dim]], [Omegas[2][i]/Omegas[4][i] : i in [1..dim]]];;
+  return [ [Omegas[3][i]/Omegas[1][i] : i in [1..dim]], [Omegas[2][i]/Omegas[1][i] : i in [1..dim]]];;
 end function;
 
 function FixModuliPoint(F, taus)
@@ -126,9 +128,8 @@ H := HeckeEigenvalueField(Parent(f));
 if maxn cmpeq false then
     maxn := NormBoundOnComputedEigenvalues(f);
 end if;
-
+// values are aligned with the list of signs [ [1,1], [1,-1], [-1,1], [-1,-1] ];
 chis, chi_signs, values, skipped := ComputeOmegaValues(24, label, eigenvalues_dir, B : maxn:=maxn);
-
 // we have elt = [* chi_index , L(f, chi)(1), CFENew(L(f, chi))
 Omegas_per_sign := [* [* elt[2]  : elt in values_per_sign *] : values_per_sign in values *];
 
@@ -136,7 +137,7 @@ Omegas := OmegasViaCremonaTrick(H, Omegas_per_sign);
 
 possible_zs := PossibleModuliPoints(H, Omegas);
 
-// force the Moduli points to be in he upper half plane by multiplying by a unit of F
+// force the Moduli points to be in the upper half plane by multiplying by a unit of F
 return [[ FixModuliPoint(H, z) : z in zs] : zs in possible_zs];
 end intrinsic;
 /*
@@ -144,7 +145,7 @@ intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->
 { Compute the period matrix à l'Oda }
 // Find the Omega values
   chis, chi_signs, values, skipped := ComputeOmegaValues(label, B : cores:=cores);
-
+  // values comes attached to the signs are [ [1,1], [1,-1], [-1,1], [-1,-1] ];
   Omegas_per_sign := [* [* elt[2] : elt in r *] : r in values *];
   // Do the Cremona trick
   H := HeckeEigenvalueField(Parent(f));
