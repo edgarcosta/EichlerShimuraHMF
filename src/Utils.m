@@ -78,6 +78,7 @@ weights := [0..Degree(g)];
       maxe := Max(e, maxe);
       if e^2 gt CC`epscomp then
         Undefine(~v, #v);
+        v := Reverse(WPSMultiply(weights[1..i-1], v, 1/mult_fact));
         return false, v, maxe, mult_fact;
       end if;
       f, p := PowerFreePart(Rationals()!Denominator(q), w);
@@ -86,7 +87,8 @@ weights := [0..Degree(g)];
       v := WPSMultiply(weights[1..i], v, s * p);
       mult_fact *:= s*p;
   end for;
-  return true, v, maxe, s;
+  gQQ := Polynomial(Reverse(WPSMultiply(weights, v, 1/mult_fact)));
+  return true, gQQ, maxe, mult_fact;
 end intrinsic;
 
 intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, fs::SeqEnum) -> .
@@ -95,7 +97,7 @@ intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, fs::SeqEnum) -> .
   assert #fs eq 2;
   assert Degree(F) eq 2;
   CCz<z> := Universe(fs);
-  _<x> := PolynomialRing(F);
+  x := PolynomialRing(F).1;
   vsCC := [Reverse(Coefficients(f)) : f in fs];
   weights := [0..Degree(fs[1])];
   vs := [];

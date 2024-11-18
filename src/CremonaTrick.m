@@ -62,7 +62,8 @@ intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComE
   end if;
   for j:=2 to #Omegas do
     qs := [Omegas[j][k]/Omegas[1][k] : k in [1..dim]];
-    R<x> := PolynomialRing(Universe(qs));
+    R := PolynomialRing(Universe(qs));
+    x := R.1;
     poly := &*[x - q : q in qs];
     cs := Eltseq(poly);
     cs_QQ := [];
@@ -86,7 +87,7 @@ intrinsic CremonaTrickWithEmbeddings(H::FldNum, Omegas::List) -> SeqEnum[FldComE
       end if;
       Append(~cs_QQ, c_QQ);
     end for;
-    QQt<t> := PolynomialRing(Rationals());
+    QQt := PolynomialRing(Rationals());
     poly_QQ := QQt!cs_QQ;
     Append(~L, MatchRoots(H, poly_QQ, qs));
   end for;

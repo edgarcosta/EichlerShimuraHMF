@@ -82,42 +82,42 @@ end function;
 
 intrinsic PossibleModuliPoints(H::FldNum, Omegas::List) -> SeqEnum
  {given the candidates for Omega_i^s, use the Riemann--Hodge relation to compute possible taus}
-// We have that Omega_{++} Omega_{--} = - Omega_{+-} Omega_{-+}
-// so we take their quotient the cross product for all the embeddings
-// and try to figure out the factor that makes this equality hold up to units
-// as units will not affect the lattice
+  // We have that Omega_{++} Omega_{--} = - Omega_{+-} Omega_{-+}
+  // so we take their quotient the cross product for all the embeddings
+  // and try to figure out the factor that makes this equality hold up to units
+  // as units will not affect the lattice
   cross_prod := [  Omegas[1][i]*Omegas[4][i]/Omegas[2][i]/Omegas[3][i]  : i in [1..Degree(H)]];
-  _<x> := PolynomialRing(Universe(cross_prod));
+  x := PolynomialRing(Universe(cross_prod)).1;
   cross_pol := &*[x-c : c in cross_prod];
 
   // RationalReconstruction returns a boolean, and the approximation x
-// the boolean = AlmostEqual(x, input), ie, x is a good approximation
-coeffs_Q := [<a,b> where a,b := RationalReconstruction(ComplexFieldExtra(Precision(c)) ! c) : c in Coefficients(cross_pol)];
-// check that we got good approximation
-assert(not(false in {x[1] : x in coeffs_Q}));
-// Now construct the polynomial over Q
-RQ<xQ> := PolynomialRing(Rationals());
-cross_pol_Q := RQ![x[2] : x in coeffs_Q];
-// we check that is a power of an irreducible polynomial
-fact := Factorisation(cross_pol_Q);
-assert(#fact eq 1);
-// take its radical, i.e., the irreducible polynomial
-cross_pol_Q := fact[1][1];
+  // the boolean = AlmostEqual(x, input), ie, x is a good approximation
+  coeffs_Q := [<a,b> where a,b := RationalReconstruction(ComplexFieldExtra(Precision(c)) ! c) : c in Coefficients(cross_pol)];
+  // check that we got good approximation
+  assert(not(false in {x[1] : x in coeffs_Q}));
+  // Now construct the polynomial over Q
+  RQ := PolynomialRing(Rationals());
+  cross_pol_Q := RQ![x[2] : x in coeffs_Q];
+  // we check that is a power of an irreducible polynomial
+  fact := Factorisation(cross_pol_Q);
+  assert(#fact eq 1);
+  // take its radical, i.e., the irreducible polynomial
+  cross_pol_Q := fact[1][1];
 
-// pick the root that matches the complex embeddings of H
-roots := Roots(cross_pol_Q, H);
-differences := [Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..Degree(H)]]) : r in roots];
-ParallelSort(~differences, ~roots);
-assert differences[1]/differences[2] lt 10^(-Precision(Universe(differences))*0.5);
-cross_prod_H := roots[1,1];
+  // pick the root that matches the complex embeddings of H
+  roots := Roots(cross_pol_Q, H);
+  differences := [Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..Degree(H)]]) : r in roots];
+  ParallelSort(~differences, ~roots);
+  assert differences[1]/differences[2] lt 10^(-Precision(Universe(differences))*0.5);
+  cross_prod_H := roots[1,1];
 
-// we have (Omega_{++} Omega_{--})/(Omega_{+-} Omega_{-+}) = cross_prod_H
-// we desire this to be a unit
-// so we compute the possible divisors for the numerator and denominator of cross_prod_H
-cnum, cden := NumberFieldDivisors(cross_prod_H);
+  // we have (Omega_{++} Omega_{--})/(Omega_{+-} Omega_{-+}) = cross_prod_H
+  // we desire this to be a unit
+  // so we compute the possible divisors for the numerator and denominator of cross_prod_H
+  cnum, cden := NumberFieldDivisors(cross_prod_H);
 
-// Find the taus
-return [ComputeModuliPoint(Omegas, pnum, pden) : pnum in cnum, pden in cden];
+  // Find the taus
+  return [ComputeModuliPoint(Omegas, pnum, pden) : pnum in cnum, pden in cden];
 end intrinsic;
 
 intrinsic ComputePossibleModuliPoints(cores::RngIntElt, label::MonStgElt, eigenvalues_dir::MonStgElt, B::RngIntElt : maxn:=false) -> SeqEnum
@@ -140,48 +140,3 @@ possible_zs := PossibleModuliPoints(H, Omegas);
 // force the Moduli points to be in the upper half plane by multiplying by a unit of F
 return [[ FixModuliPoint(H, z) : z in zs] : zs in possible_zs];
 end intrinsic;
-/*
-intrinsic PeriodMatrixOda(label::MonStgElt : B := 75, cores := 4, eps := 1E-6)->.
-{ Compute the period matrix à l'Oda }
-// Find the Omega values
-  chis, chi_signs, values, skipped := ComputeOmegaValues(label, B : cores:=cores);
-  // values comes attached to the signs are [ [1,1], [1,-1], [-1,1], [-1,-1] ];
-  Omegas_per_sign := [* [* elt[2] : elt in r *] : r in values *];
-  // Do the Cremona trick
-  H := HeckeEigenvalueField(Parent(f));
-  Omegas := [* CremonaTrickWithEmbeddings(H, r) : r in Omegas_per_sign *];
-
-  // Detect the cross product
-  cross_prod := [  Omegas[1][i]*Omegas[4][i]/Omegas[2][i]/Omegas[3][i]  : i in [1..Degree(H)]];
-  _<x> := PolynomialRing(Universe(cross_prod));
-  cross_pol := &*[x-c : c in cross_prod];
-  // RationalReconstruction returns a boolean, and the approximation x
-  // the boolean = AlmostEqual(x, input), ie, x is a good approximation
-  coeffs_Q := [<a,b> where a,b := RationalReconstruction(ComplexFieldExtra(Precision(c)) ! c) : c in Coefficients(cross_pol)];
-  // check that we got good approximation
-  assert(not(false in {x[1] : x in coeffs_Q}));
-  // Now construct the polynomial over Q
-  RQ<xQ> := PolynomialRing(Rationals());
-  cross_pol_Q := RQ![x[2] : x in coeffs_Q];
-  // we check that is a power of an irreducible polynomial
-  fact := Factorisation(cross_pol_Q);
-  assert(#fact eq 1);
-  // take its radical, i.e., the irreducible polynomial
-  cross_pol_Q := fact[1][1];
-
-  // pick the root that matches the complex embeddings of H
-  eps := 1E-6; // FIXME, maybe sort by the difference?
-  roots := Roots(cross_pol_Q, H);
-  differences := [Max([Abs( Evaluate(r[1], InfinitePlaces(H)[j]) - cross_prod[j] ) : j in [1..dim]]) : r in roots];
-  ParallelSort(~differences, ~roots);
-  assert differences[1]/differences[2] lt 10^(-Precision(Universe(differences))*0.5);
-  cross_prod_H := roots[1,1];
-  cnum, cden := NumberFieldDivisors(cross_prod_H);
-
-  // Find the taus and period matrices
-  possible_taus := [TausGuess(Omegas, dim, pnum, pden) : pnum in cnum, pden in cden];
-  fixed_taus := [[ FixTaus(H, tau) : tau in taus] : taus in possible_taus];
-  PeriodMatrices := [ [ModuliToBigPeriodMatrixNoam(H, tau) : tau in taus] : taus in fixed_taus];
-    return <PeriodMatrices, <cnum, cden>, fixed_taus>;
-end intrinsic;
-*/
