@@ -9,6 +9,7 @@ if ComputeLvalues then
   B := 25;
   f := LMFDBHMFwithEigenvalues(label, eigenvalues_dir);
   maxn := NormBoundOnComputedEigenvalues(f);
+  assert maxn ge 400000;
   time possible_zs := ComputePossibleModuliPoints(cores, label, eigenvalues_dir, B : maxn:=400000);
   _<I> := Universe(possible_zs[1,1]);
   OH := Integers(HeckeEigenvalueField(Parent(f)));
