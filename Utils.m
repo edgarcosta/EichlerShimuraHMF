@@ -61,6 +61,33 @@ intrinsic TwoIsogenous(zs::SeqEnum[FldComElt], H::FldNum) -> SeqEnum[SeqEnum[Fld
   return [[(z + Evaluate(r, pl[i] : Precision:=prec))/2 : i->z in zs] : r in reps] cat [[2*z : z in zs]];
 end intrinsic;
 
+intrinsic RationalReconstructPolynomial(g::RngUPolElt[FldCom]) -> .
+{ Given a complex polynomial that is embedding of rational polynomial, try to reconstruct the original polynomial }
+
+CCz<z> := Parent(g);
+vCC := Reverse(Coefficients(g));
+v := [];
+maxe := 0;
+CC := Universe(vCC);
+mult_fact := 1;
+weights := [0..Degree(g)];
+  for i->w in weights do
+      _, q := RationalReconstruction(vCC[i]);
+      Append(~v, q);
+      _, e := AlmostEqual(vCC[i], q);
+      maxe := Max(e, maxe);
+      if e^2 gt CC`epscomp then
+        Undefine(~v, #v);
+        return false, v, maxe, mult_fact;
+      end if;
+      f, p := PowerFreePart(Rationals()!Denominator(q), w);
+      s := &*PrimeDivisors(Integers()!f);
+      vCC := WPSMultiply(weights, vCC, s * p);
+      v := WPSMultiply(weights[1..i], v, s * p);
+      mult_fact *:= s*p;
+  end for;
+  return true, v, maxe, s;
+end intrinsic;
 
 intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, fs::SeqEnum) -> .
 { Given a pair of polynomial's corresponding the two embeddings of a quadratic number field F, reconstruct the original polynomial }
@@ -89,6 +116,7 @@ intrinsic ReconstructConjugatePolynomialsPair(F::FldNum, fs::SeqEnum) -> .
     _, e := AlmostEqual(aCC, a);
     maxe := Max(e, maxe);
     if e^2 gt CC`epscomp then
+      Undefine(~v, #v);
       return false, vs, maxe, mult_fact;
     end if;
     Append(~vs, a);
