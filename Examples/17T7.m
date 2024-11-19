@@ -3,6 +3,12 @@ AttachSpec("spec");
 ComputeLvalues := false;
 cores := 24;
 
+if not assigned UseNewtonRaphson then
+  UseNewtonRaphson := false;
+else
+  UseNewtonRaphson := eval UseNewtonRaphson;
+end if;
+
 if ComputeLvalues then
   eigenvalues_dir := "../EichlerShimuraHMF-eigenvalues/";
   label := "2.2.12.1-578.1-c";
@@ -68,8 +74,13 @@ end function;
 CCextra := ComplexField(300);
 V := VectorSpace(CCextra, 4);
 two_torsion_scaled := map<V -> V | x :-> two_torsion_wrapper(x)>;
-// SetVerbose("NumericalSolve", 1);
-time y := Broyden(two_torsion_scaled, V!twoz0[1], 1e-250);
+SetVerbose("NumericalSolve", 1);
+if UseNewtonRaphson then
+  d_two_torsion_scaled := NumericalJacobian(two_torsion_scaled);
+  time y := NewtonRaphson(two_torsion_scaled, d_two_torsion_scaled, V!twoz0[1], 1e-250);
+else
+  time y := Broyden(two_torsion_scaled, V!twoz0[1], 1e-250);
+end if;
 g := TwoTorsionPolynomial(Eltseq(y), 1*OH, 1*OH);
 b, gQQ, maxe, scalar := RationalReconstructPolynomial(g);
 assert b;
