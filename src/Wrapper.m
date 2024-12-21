@@ -49,7 +49,7 @@ function ComputeModuliPoint(Omegas, pnum, pden)
   // i.e., Omegas[1] Omegas[4] = - Omegas[2] Omegas[3]
   // in practice, we have this up to a unit,
   // so we can avoid to the Omega with the lowest precision
-  _, i := Min([Precision(Universe(r)) : r in Omegas]);
+  _, i := Min([Precision(r[1]) : r in Omegas]);
   if i eq 1 then
         nnd := [2, 3, 4]; // 1 = - 2*3/4
   elif i eq 4 then
@@ -129,7 +129,7 @@ if maxn cmpeq false then
     maxn := NormBoundOnComputedEigenvalues(f);
 end if;
 // values are aligned with the list of signs [ [1,1], [1,-1], [-1,1], [-1,-1] ];
-chis, chi_signs, values, skipped := ComputeOmegaValues(24, label, eigenvalues_dir, B : maxn:=maxn);
+chis, chi_signs, values, skipped := ComputeOmegaValues(cores, label, eigenvalues_dir, B : maxn:=maxn);
 // we have elt = [* chi_index , L(f, chi)(1), CFENew(L(f, chi))
 Omegas_per_sign := [* [* elt[2]  : elt in values_per_sign *] : values_per_sign in values *];
 
